@@ -1,3 +1,10 @@
+import numpy as np
+from matplotlib import pyplot as plt
+import torch
+from tqdm import tqdm
+
+import functions
+
 def run_single_neuron(input_trains, weights, target, args):
   """
   Run a single LIF neuron as specificed by Zenke Ganguli for one epoch
@@ -14,6 +21,12 @@ def run_single_neuron(input_trains, weights, target, args):
   thres = args['thres']
   u_rest = args['u_rest']
   nb_steps = args['nb_steps']
+  device = args['device']
+  dtype = args['dtype']
+  nb_inputs = args['nb_inputs']
+  nb_outputs = args['nb_outputs']
+  alpha = args['alpha']
+  beta = args['beta']
 
   # initialize membrane and synaptic current 
   mem = u_rest * torch.ones(nb_outputs, device=device, dtype=dtype)
@@ -30,7 +43,7 @@ def run_single_neuron(input_trains, weights, target, args):
 
   for t in range(nb_steps):
 
-    out = spike_fn(mem, thres)
+    out = functions.spike_fn(mem, thres, args)
 
     spk_rec.append(out)
     mem_rec.append(mem)
@@ -58,7 +71,7 @@ def run_single_neuron(input_trains, weights, target, args):
   spk_rec = torch.stack(spk_rec, dim=0)
   spk_rec = torch.flatten(spk_rec) # stack as a 1-D array for easy difference with target train for error signal evaluation
   # compute presynaptic traces of shape: (nb_inputs, timesteps) 
-  presynaptic_traces = presynaptic_trace(input_trains, args) 
+  presynaptic_traces = functions.presynaptic_trace(input_trains, args) 
 
   # evaluate hebbian coincidence
   h = mem_rec.T - thres  # shape: (nb_outputs, timesteps)
@@ -68,9 +81,9 @@ def run_single_neuron(input_trains, weights, target, args):
   hebbian = A * B # AB.T shape: (nb_inputs, nb_outputs, nb_timesteps)
 
   # eligibility trace
-  eligibility = eligibility_trace(hebbian, args)
+  eligibility = functions.eligibility_trace(hebbian, args)
   
   # error signal
-  error = error_signal(spk_rec, target, args)
+  error = functions.error_signal(spk_rec, target, args)
 
   return mem_rec, spk_rec, error, eligibility, presynaptic_traces

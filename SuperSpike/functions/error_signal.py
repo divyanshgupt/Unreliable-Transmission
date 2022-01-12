@@ -1,4 +1,7 @@
-#@title Error Signal 
+import numpy as np
+from matplotlib import pyplot as plt
+import torch
+from tqdm import tqdm
 
 def error_signal(output, target, args):
   """
@@ -15,6 +18,8 @@ def error_signal(output, target, args):
   t_decay = args['t_decay_alpha']
   dt = args['timestep_size']
   nb_timesteps = args['nb_steps']
+  device = args['device']
+  dtype = args['dtype']
 
   trace_1 = torch.zeros(nb_timesteps, device=device, dtype=dtype)
   trace_2 = torch.zeros(nb_timesteps, device=device, dtype=dtype)

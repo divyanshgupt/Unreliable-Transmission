@@ -1,3 +1,8 @@
+import numpy as np
+from matplotlib import pyplot as plt
+import torch
+from tqdm import tqdm
+
 def poisson_trains(n, lam, args):
   """
 
@@ -9,14 +14,16 @@ def poisson_trains(n, lam, args):
   """
   timesteps = args['nb_steps']
   dt = args['timestep_size']
+  device = args['device']
+  dtype = args['dtype']
   
   trains = torch.zeros((n, timesteps), device=device, dtype=dtype)
   unif = torch.rand((n, timesteps), device=device, dtype=dtype)
 
-#  counter = 0
+  #  counter = 0
   for i in range(n):
     trains[unif <= lam[i]*dt] = 1
-#    counter += len(unif <= lam[i]*dt)
-#  print("Total No. of Spikes", counter)
+  #    counter += len(unif <= lam[i]*dt)
+  #  print("Total No. of Spikes", counter)
 
   return trains

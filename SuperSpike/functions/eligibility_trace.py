@@ -1,3 +1,10 @@
+import numpy as np
+from matplotlib import pyplot as plt
+import torch
+from tqdm import tqdm
+
+import functions
+
 def eligibility_trace(hebbian, args):
   """
   Evaluate the hebbian-coincidence based eligibility trace over all timesteps
@@ -13,6 +20,9 @@ def eligibility_trace(hebbian, args):
   t_rise = args['t_rise_alpha']
   t_decay = args['t_decay_alpha']
   nb_timesteps = args['nb_steps']
+  device = args['device']
+  dtype = args['dtype']
+  
   nb_inputs = hebbian.shape[0]
   nb_outputs = hebbian.shape[1]
 

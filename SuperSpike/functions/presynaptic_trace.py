@@ -1,3 +1,8 @@
+import numpy as np
+from matplotlib import pyplot as plt
+import torch
+from tqdm import tqdm
+
 def presynaptic_trace(input_trains, args):
   """
   Evaluates the presynaptic trace (double exponential kernel)
@@ -12,6 +17,9 @@ def presynaptic_trace(input_trains, args):
   t_rise = args['t_rise']
   t_decay = args['t_decay']
   nb_timesteps = args['nb_steps']
+  device = args['device']
+  dtype = args['dtype']
+  
   nb_trains = len(input_trains)
 
   trace_1 = torch.zeros((nb_trains, nb_timesteps), device=device, dtype=dtype)
