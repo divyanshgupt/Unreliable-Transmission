@@ -32,7 +32,7 @@ args = {'thres': -50,
         'nb_outputs': 1,
         'device': device, # for functions in different modules
         'dtype': dtype,
-        'nb_epochs': 10
+        'nb_epochs': 1000
         } 
 
 
@@ -67,12 +67,13 @@ weights = functions.initialize_weights(nb_inputs, nb_outputs, args, scale=80)
 
 nb_epochs = args['nb_epochs']
 loss_rec = []
-v_ij = 1e-2*torch.ones((nb_inputs, nb_outputs), device=device, dtype=dtype)
-r_0 = 5e-3 # basal learning rate
+v_ij = 1*torch.ones((nb_inputs, nb_outputs), device=device, dtype=dtype)
+r_0 = 1e-3 # basal learning rate
+
 
 for i in range(nb_epochs):
 
-    print("Iteration:", i+1)
+    print("\n Iteration:", i+1)
     mem_rec, spk_rec, error_rec, eligibility_rec, pre_trace_rec = functions.run_single_neuron(input_trains, weights,
                                                                                     target, args)
     # loss = van_rossum_loss(spk_rec, target, args)
@@ -100,5 +101,14 @@ for i in range(nb_epochs):
     v_ij = torch.max(gamma*v_ij, g_ij2)
 
     r_ij = r_0 / torch.sqrt(v_ij)
+    rate_med = torch.median(r_ij)
+    print("Median Learning Rate:", rate_med)
+    rate_mean = torch.mean(r_ij)
+    print("Avg. Learning Rate:", rate_mean)
+    
+    print("Rate of 20th weight:", r_ij[19])
+    print("Rate of 67th weight:", r_ij[66])
 
     weights += r_ij * weight_updates
+
+plt.plot(loss_rec)
