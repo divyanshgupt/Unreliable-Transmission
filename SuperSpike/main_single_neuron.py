@@ -59,17 +59,20 @@ input_trains = functions.poisson_trains(100, spk_freq*np.ones(100), args)
 target = torch.zeros(nb_steps, device=device, dtype=dtype)
 target[:: nb_steps//5] = 1
 
-
 weights = functions.initialize_weights(nb_inputs, nb_outputs, args, scale=80)
-
-
-# Train neuron
 
 nb_epochs = args['nb_epochs']
 loss_rec = []
-v_ij = 1*torch.ones((nb_inputs, nb_outputs), device=device, dtype=dtype)
-r_0 = 1e-3 # basal learning rate
+v_ij = 1e-2*torch.zeros((nb_inputs, nb_outputs), device=device, dtype=dtype)
+r_0 = 5e-3 # basal learning rate
 
+# Weight to track:
+x = 19
+
+v_ij_rec = []
+g_ij2_rec = []
+r_ij_rec = []
+v_ij_rec.append(v_ij[x])
 
 for i in range(nb_epochs):
 
@@ -85,22 +88,40 @@ for i in range(nb_epochs):
     norm_factor, _ = torch.max(torch.abs(eligibility_rec), dim=2) # take max along time dimension for each i-jth synapse
     norm_factor = torch.unsqueeze(norm_factor, 2)
 
-    eligibility_rec = eligibility_rec / norm_factor
+    eligibility_rec = eligibility_rec / norm_factor # shape: (nb_inputs, nb_outputs, nb_steps)
     eligibility_rec[eligibility_rec != eligibility_rec] = 0
+    assert eligibility_rec.shape == (nb_inputs, nb_outputs, nb_steps), "eligibility_rec shape incorrect"
 
     # normalizing the error signal:
     norm_factor = torch.max(torch.abs(error_rec))
-    error_rec = error_rec / norm_factor
+    error_rec = error_rec / norm_factor  # shape: shape: (nb_steps,)
+    assert error_rec.shape == (nb_steps,), "error_rec shape incorrect"
+    #print(error_rec)
 
     # Weight update
     weight_updates = torch.sum(error_rec * eligibility_rec, dim=2)
+    assert weight_updates.shape == (nb_inputs, nb_outputs), "wegiht_updates shape incorrect"
 
     # per-parameter learning rate
+
     gamma = float(np.exp(-dt/args['tau_rms']))
-    g_ij2 = (error_rec * eligibility_rec)[:, :, -1]**2
+#   g_ij2 = (error_rec * eligibility_rec)[:, :, -1]**2 # this has a problem 
+    g_ij2 = torch.sum((error_rec*eligibility_rec)**2, dim=2)
+    assert g_ij2.shape == (nb_inputs, nb_outputs), "g_ij2 shape incorrect"
+    # Question 1: Whether to take the value of g_ij at the last timestep in each epoch or to take the sum of its values over all timesteps in the epoch?
+    # Question 2: How to do normalized convolution for error_signal and eligibility_trace?
+
     v_ij = torch.max(gamma*v_ij, g_ij2)
 
+    # Store learning rate information for this epoch for xth weight
+    g_ij2_rec.append(g_ij2[x]) 
+    v_ij_rec.append(v_ij[x])
+
+    # Evaluate learning rate for this epoch
     r_ij = r_0 / torch.sqrt(v_ij)
+
+    r_ij_rec.append(r_ij[x])
+
     rate_med = torch.median(r_ij)
     print("Median Learning Rate:", rate_med)
     rate_mean = torch.mean(r_ij)
@@ -111,4 +132,15 @@ for i in range(nb_epochs):
 
     weights += r_ij * weight_updates
 
-plt.plot(loss_rec)
+fig, ax = plt.subplots(2, sharex=True)
+
+ax[0].plot(loss_rec)
+ax[0].set_title("Loss over epochs")
+ax[0].set_ylabel("Loss")
+
+#print("Plotting learning rate parameters")
+ax[1].plot(v_ij_rec, label='v_ij')
+ax[1].plot(g_ij2_rec, label='g_ij2')
+ax[1].plot(r_ij_rec, label='r_ij')
+ax[1].set_title("Learning rate parameters for the " + str(x) + 'th neuron')
+
