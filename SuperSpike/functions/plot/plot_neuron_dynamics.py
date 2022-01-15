@@ -1,4 +1,8 @@
-def plot_neuron_dynamics(mem_rec, spk_rec, error_rec, target, figsize=(15, 10), dpi=120):
+from matplotlib import pyplot as plt
+import numpy as np
+import functions
+
+def plot_neuron_dynamics(mem_rec, spk_rec, error_rec, target, args, figsize=(15, 10), dpi=120):
 
     """
     Plots target train, error signal, output train and membrane potential from top to bottom in that order
@@ -9,6 +13,8 @@ def plot_neuron_dynamics(mem_rec, spk_rec, error_rec, target, figsize=(15, 10), 
         target: 
     """
 
+    nb_steps = args['nb_steps']
+    
     fig, axs = plt.subplots(4, sharex=True, figsize=figsize, dpi=dpi)
 
     ## Plot the target spike train

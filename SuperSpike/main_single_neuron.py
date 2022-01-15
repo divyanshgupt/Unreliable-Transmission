@@ -4,6 +4,7 @@ import torch
 from tqdm import tqdm
 
 import functions 
+import datetime
 
 # set device
 dtype = torch.float
@@ -32,7 +33,7 @@ args = {'thres': -50,
         'nb_outputs': 1,
         'device': device, # for functions in different modules
         'dtype': dtype,
-        'nb_epochs': 1000
+        'nb_epochs': 4
         } 
 
 
@@ -56,25 +57,39 @@ args['beta'] = beta
 spk_freq = 10 # not sure about this, but assuming it since the paper uses 10 Hz frequency as the target output frequency (actually, 5 equidistant spikes over 500 ms)
 input_trains = functions.poisson_trains(100, spk_freq*np.ones(100), args)
 
+# Create Target Train
 target = torch.zeros(nb_steps, device=device, dtype=dtype)
 target[:: nb_steps//5] = 1
 
-weights = functions.initialize_weights(nb_inputs, nb_outputs, args, scale=80)
+weights = functions.initialize_weights(nb_inputs, nb_outputs, args, scale=80) # initialize weights
 
-nb_epochs = args['nb_epochs']
-loss_rec = []
-v_ij = 1e-2*torch.zeros((nb_inputs, nb_outputs), device=device, dtype=dtype)
+# v_ij = 1e-2*torch.zeros((nb_inputs, nb_outputs), device=device, dtype=dtype)
 r_0 = 5e-3 # basal learning rate
 
-# Weight to track:
-x = 19
+new_weights, loss_rec, learning_rate_params = functions.train_single_neuron(input_trains, target, weights, r_0, args)
+r_ij, v_ij, g_ij2 = learning_rate_params
 
-v_ij_rec = []
-g_ij2_rec = []
-r_ij_rec = []
-v_ij_rec.append(v_ij[x])
+location = "../../data/" + str(datetime.datetime.now()) + ', rate = ' + str(r_0) + '/'
 
-for i in range(nb_epochs):
+# Store parameters (in dict args) in the given locatio
+
+functions.plot.plot_loss(loss_rec, location, args) # Saves the loss-over-epochs plot in the given location
+
+functions.plot.plot_learning_rate_params(learning_rate_params, location, args)
+
+plt.plot(loss_rec)
+plt.title("Loss over epochs")
+plt.show()
+
+plt.plot(torch.flatten(torch.mean(r_ij, dim=0)[0]), label='Avg. Learning Rate')
+plt.plot(torch.flatten(torch.median(r_ij, dim=0)[0]), label='Median Learning Rate')
+plt.title("Learning Rate over Epochs")
+plt.show()
+
+
+
+
+""" for i in range(nb_epochs):
 
     print("\n Iteration:", i+1)
     mem_rec, spk_rec, error_rec, eligibility_rec, pre_trace_rec = functions.run_single_neuron(input_trains, weights,
@@ -131,8 +146,9 @@ for i in range(nb_epochs):
     print("Rate of 67th weight:", r_ij[66])
 
     weights += r_ij * weight_updates
+ """
 
-fig, ax = plt.subplots(2, sharex=True)
+""" fig, ax = plt.subplots(2, sharex=True)
 
 ax[0].plot(loss_rec)
 ax[0].set_title("Loss over epochs")
@@ -142,5 +158,5 @@ ax[0].set_ylabel("Loss")
 ax[1].plot(v_ij_rec, label='v_ij')
 ax[1].plot(g_ij2_rec, label='g_ij2')
 ax[1].plot(r_ij_rec, label='r_ij')
-ax[1].set_title("Learning rate parameters for the " + str(x) + 'th neuron')
+ax[1].set_title("Learning rate parameters for the " + str(x) + 'th neuron') """
 

@@ -48,3 +48,5 @@ def initialize_weights_multilayer(nb_inputs, nb_hidden, nb_outputs, args, weight
     w2 = torch.nn.init.normal_(w2, mean=0.0, std=weight_scale/np.sqrt(nb_hidden))
 
     return w1, w2
+
+    

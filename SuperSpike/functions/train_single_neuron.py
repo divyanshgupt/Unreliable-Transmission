@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 import tqdm
 import functions
 import pickle
-from time import datetime
+import datetime
 
 
 def train_single_neuron(input_trains, target, weights, r_0, args):
@@ -79,7 +79,7 @@ def train_single_neuron(input_trains, target, weights, r_0, args):
         # Question 1: Whether to take the value of g_ij at the last timestep in each epoch or to take the sum of its values over all timesteps in the epoch?
         # Question 2: How to do normalized convolution for error_signal and eligibility_trace?
 
-        v_ij = torch.max(torch.stack([gamma*v_ij, g_ij2], dim=2), dim=2) # shape: (nb_inputs, nb_outputs)
+        v_ij, _ = torch.max(torch.stack([gamma*v_ij, g_ij2], dim=2), dim=2) # shape: (nb_inputs, nb_outputs)
         assert v_ij.shape == (nb_inputs, nb_outputs), "v_ij shape incorrect"
         
         # Evaluate learning rate for this epoch
