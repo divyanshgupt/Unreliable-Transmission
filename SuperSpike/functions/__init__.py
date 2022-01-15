@@ -6,6 +6,7 @@ from .presynaptic_trace import *
 from .run_single_neuron import *
 from .van_rossum_loss import *
 from .spike_fn import *
+from .train_single_neuron import *
 
 # specific to multi_layer_networks:
 from .run_multilayer_network import *

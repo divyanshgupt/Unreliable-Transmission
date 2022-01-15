@@ -2,8 +2,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 from tqdm import tqdm
 import torch
-
-
+from time import datetime
+import pickle
 import functions
 
 # set device
@@ -116,7 +116,7 @@ for i in tqdm(range(epochs)):
 # Store the learned weights
 learned_weights = w1, w2
 file_name = "weights " + str(datetime.datetime.now())
-weight_file = open(filename, 'w')
+weight_file = open(file_name, 'w')
 pickle.dump(learned_weights, weight_file)
 
 
