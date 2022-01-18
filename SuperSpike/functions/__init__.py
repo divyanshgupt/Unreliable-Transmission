@@ -13,4 +13,5 @@ from .run_multilayer_network import *
 from .random_feedback import *
 
 # plotting sub-package
-import plot
+from .plot import *
+

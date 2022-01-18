@@ -2,9 +2,11 @@ import numpy as np
 from matplotlib import pyplot as plt
 import torch
 from tqdm import tqdm
-
+import os # To create a folder for each run
 import functions 
+#import functions.plot
 import datetime
+import json # To save simulation parameters in a text file
 
 # set device
 dtype = torch.float
@@ -64,20 +66,45 @@ target[:: nb_steps//5] = 1
 weights = functions.initialize_weights(nb_inputs, nb_outputs, args, scale=80) # initialize weights
 
 # v_ij = 1e-2*torch.zeros((nb_inputs, nb_outputs), device=device, dtype=dtype)
-r_0 = 5e-3 # basal learning rate
+learning_rates = np.array([10, 5, 1, 0.5, 0.1]) * 1e-3
 
-new_weights, loss_rec, learning_rate_params = functions.train_single_neuron(input_trains, target, weights, r_0, args)
-r_ij, v_ij, g_ij2 = learning_rate_params
+for r_0 in learning_rates:
+    #r_0 = 5e-3 # basal learning rate
 
-location = "../../data/" + str(datetime.datetime.now()) + ', rate = ' + str(r_0) + '/'
+    new_weights, loss_rec, learning_rate_params = functions.train_single_neuron(input_trains, target, weights, r_0, args)
+    #r_ij, v_ij, g_ij2 = learning_rate_params
 
-# Store parameters (in dict args) in the given locatio
+    location = "../../data/" + str(datetime.datetime.now()) + ', rate = ' + str(r_0) + '/'
 
-functions.plot.plot_loss(loss_rec, location, args) # Saves the loss-over-epochs plot in the given location
+    os.makedirs(location)
+    # Store parameters (in dict args) in the given location
+    functions.plot.plot_loss(loss_rec, location, args) # Saves the loss-over-epochs plot in the given location
+    functions.plot.plot_learning_rate_params(learning_rate_params, location, args)
 
-functions.plot.plot_learning_rate_params(learning_rate_params, location, args)
+    # Store weights
+    file_name = location + "weights " + str(datetime.datetime.now())
+    weight_file = open(file_name, 'w')
+    json.dump(new_weights, weight_file)
 
-plt.plot(loss_rec)
+    # Store loss_rec
+    file_name = location + "loss_rec " + str(datetime.datetime.now())
+    weight_file = open(file_name, 'w')
+    json.dump(loss_rec, weight_file)
+
+    # Store learning_rate_params:
+    file_name = location + "learning_rate_params " + str(datetime.datetime.now())
+    param_file = open(file_name, 'w')
+    json.dump(learning_rate_params, param_file)
+
+    # Store args:
+    file_name = location + "args " + str(datetime.datetime.now())
+    args_file = open(file_name, 'w')
+    json.dump(args, args_file)
+
+
+
+
+"""plt.plot(loss_rec)
 plt.title("Loss over epochs")
 plt.show()
 
@@ -86,8 +113,7 @@ plt.plot(torch.flatten(torch.median(r_ij, dim=0)[0]), label='Median Learning Rat
 plt.title("Learning Rate over Epochs")
 plt.show()
 
-
-
+"""
 
 """ for i in range(nb_epochs):
 
