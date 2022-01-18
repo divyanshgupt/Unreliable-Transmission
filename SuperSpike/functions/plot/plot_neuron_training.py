@@ -20,6 +20,7 @@ def plot_loss(loss_rec, location, args, figsize=[15,10], dpi=120):
     plt.ylabel("Loss")
     plt.figure(figsize=figsize, dpi=dpi)
     plt.savefig(location + 'loss over epochs.png')
+    print("Loss plot saved")
 #   plt.show()
 
 def plot_learning_rate_params(learning_rate_params, location, args, figsize=[15, 10], dpi=120):
@@ -37,7 +38,9 @@ def plot_learning_rate_params(learning_rate_params, location, args, figsize=[15,
     r_ij_rec, v_ij_rec, g_ij2_rec = learning_rate_params
 
     for i in range(nb_inputs): 
+        print("Saving plot", i)
         fig, ax = plt.subplots(2, figsize=figsize, dpi=dpi, sharex=True)
+        fig.clear()
 
         # plot avg and median learning rate
         #ax[0].plot(torch.flatten(torch.mean(r_ij_rec, dim=0)[0]), label='Avg. Learning Rate')

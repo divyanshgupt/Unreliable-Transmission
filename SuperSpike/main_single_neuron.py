@@ -7,6 +7,7 @@ import functions
 #import functions.plot
 import datetime
 import json # To save simulation parameters in a text file
+import pdb
 
 # set device
 dtype = torch.float
@@ -73,31 +74,40 @@ for r_0 in learning_rates:
 
     new_weights, loss_rec, learning_rate_params = functions.train_single_neuron(input_trains, target, weights, r_0, args)
     #r_ij, v_ij, g_ij2 = learning_rate_params
-
-    location = "../../data/" + str(datetime.datetime.now()) + ', rate = ' + str(r_0) + '/'
-
+    
+    data_folder = "data/" + str(datetime.datetime.today())[:10] + ' rate = ' + str(r_0) + '/'
+    #os.makedirs(location)
+    location = os.path.abspath(data_folder)
+    location = os.path.join(os.getcwd(), location)
+    print(location)
+#    data_folder = "/data/rate = " + str(r_0) + ' /'
+#    location = os.path.join(os.path.abspath(), data_folder)
+#    print(location)
+#    break
     os.makedirs(location)
+    #location = ''
+    #location = os.path.cudir()
     # Store parameters (in dict args) in the given location
     functions.plot.plot_loss(loss_rec, location, args) # Saves the loss-over-epochs plot in the given location
     functions.plot.plot_learning_rate_params(learning_rate_params, location, args)
 
     # Store weights
-    file_name = location + "weights " + str(datetime.datetime.now())
+    file_name = location + "weights " #+ str(datetime.datetime.now())[:10]
     weight_file = open(file_name, 'w')
     json.dump(new_weights, weight_file)
 
     # Store loss_rec
-    file_name = location + "loss_rec " + str(datetime.datetime.now())
+    file_name = location + "loss_rec " #+ str(datetime.datetime.now())
     weight_file = open(file_name, 'w')
     json.dump(loss_rec, weight_file)
 
     # Store learning_rate_params:
-    file_name = location + "learning_rate_params " + str(datetime.datetime.now())
+    file_name = location + "learning_rate_params " #+ str(datetime.datetime.now())
     param_file = open(file_name, 'w')
     json.dump(learning_rate_params, param_file)
 
     # Store args:
-    file_name = location + "args " + str(datetime.datetime.now())
+    file_name = location + "args " #+ str(datetime.datetime.now())
     args_file = open(file_name, 'w')
     json.dump(args, args_file)
 
