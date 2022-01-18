@@ -19,7 +19,7 @@ def plot_loss(loss_rec, location, args, figsize=[15,10], dpi=120):
     plt.xlabel("Epochs (each of 0.5 secs)")
     plt.ylabel("Loss")
     plt.figure(figsize=figsize, dpi=dpi)
-    plt.savefig(location + 'loss over epochs.png')
+    plt.savefig(location + '/loss over epochs.png')
     print("Loss plot saved")
 #   plt.show()
 
@@ -54,4 +54,4 @@ def plot_learning_rate_params(learning_rate_params, location, args, figsize=[15,
         ax[1].plot(g_ij2_rec[i], label="g_ij2")
         ax[1].legend(loc='best')
 
-        plt.savefig(location + 'neuron ' + str(i) +' learning_rate_params.png')
+        plt.savefig(location + '/neuron ' + str(i) +' learning_rate_params.png')
