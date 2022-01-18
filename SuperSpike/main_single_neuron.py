@@ -102,8 +102,6 @@ for r_0 in learning_rates:
     json.dump(args, args_file)
 
 
-
-
 """plt.plot(loss_rec)
 plt.title("Loss over epochs")
 plt.show()
