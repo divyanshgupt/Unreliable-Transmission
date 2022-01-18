@@ -8,6 +8,7 @@ import functions
 import datetime
 import json # To save simulation parameters in a text file
 import pdb
+import pickle
 
 # set device
 dtype = torch.float
@@ -94,22 +95,22 @@ for r_0 in learning_rates:
     # Store weights
     file_name = location + "weights " #+ str(datetime.datetime.now())[:10]
     weight_file = open(file_name, 'w')
-    json.dump(new_weights, weight_file)
+    pickle.dump(new_weights, weight_file)
 
     # Store loss_rec
     file_name = location + "loss_rec " #+ str(datetime.datetime.now())
     weight_file = open(file_name, 'w')
-    json.dump(loss_rec, weight_file)
+    pickle.dump(loss_rec, weight_file)
 
     # Store learning_rate_params:
     file_name = location + "learning_rate_params " #+ str(datetime.datetime.now())
     param_file = open(file_name, 'w')
-    json.dump(learning_rate_params, param_file)
+    pickle.dump(learning_rate_params, param_file)
 
     # Store args:
     file_name = location + "args " #+ str(datetime.datetime.now())
     args_file = open(file_name, 'w')
-    json.dump(args, args_file)
+    pickle.dump(args, args_file)
 
 
 """plt.plot(loss_rec)
