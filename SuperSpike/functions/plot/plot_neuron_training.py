@@ -13,12 +13,11 @@ def plot_loss(loss_rec, location, args, figsize=[15,10], dpi=120):
         stores the loss-over-epochs plot in the given directory
     
     """
-    plt.figure()
+    plt.figure(figsize=figsize, dpi=dpi)
     plt.plot(loss_rec)
     plt.title("Loss over epochs")
     plt.xlabel("Epochs (each of 0.5 secs)")
     plt.ylabel("Loss")
-    plt.figure(figsize=figsize, dpi=dpi)
     plt.savefig(location + '/loss over epochs.png')
     print("Loss plot saved")
 #   plt.show()
@@ -34,15 +33,17 @@ def plot_learning_rate_params(learning_rate_params, location, args, figsize=[15,
     """
 
     nb_inputs = args['nb_inputs']
+    nb_epochs = args['nb_epochs']
 
     r_ij_rec, v_ij_rec, g_ij2_rec = learning_rate_params
 
     for i in range(nb_inputs): 
 
         print("Saving plot", i)
-        
+
         fig, ax = plt.subplots(2, figsize=figsize, dpi=dpi, sharex=True)
         #fig.clear()
+
 
         # plot avg and median learning rate
         #ax[0].plot(torch.flatten(torch.mean(r_ij_rec, dim=0)[0]), label='Avg. Learning Rate')
@@ -50,10 +51,13 @@ def plot_learning_rate_params(learning_rate_params, location, args, figsize=[15,
 
         ax[0].plot(r_ij_rec[i], label="learning_rate")
         ax[0].legend(loc='best')
+        ax[0].set_xlim(0, nb_epochs)
 
         # plot v_ij, g_ij2
         ax[1].plot(v_ij_rec[i], label="v_ij")
         ax[1].plot(g_ij2_rec[i], label="g_ij2")
         ax[1].legend(loc='best')
+        ax[1].set_xlim(0, nb_epochs)
+        ax[1].set_xlabel('Epochs')
 
         plt.savefig(location + '/neuron ' + str(i) +' learning_rate_params.png')
