@@ -30,7 +30,11 @@ def error_signal(output, target, args):
  # print("Difference Shape", difference.shape)
 
   for t in range(nb_steps - 1):
-    trace_1[t + 1] = trace_1[t] + (-trace_1[t]/t_rise + difference[t])*dt
-    trace_2[t + 1] = trace_2[t] + (-trace_2[t] + trace_1[t])*dt/t_decay
+  #  trace_1[t + 1] = trace_1[t] + (-trace_1[t]/t_rise + difference[t])*dt
+  #  trace_2[t + 1] = trace_2[t] + (-trace_2[t] + trace_1[t])*dt/t_decay
+
+  # New implementation (cognizant of the dirac delta):
+    trace_1[t+1] = trace_1[t] + (-trace_1[t]/t_rise)*dt + difference[t]
+    trace_2[t+1] = trace_2[t] + (-trace_2[t] + trace_1[t])*dt/t_decay
 
   return trace_2

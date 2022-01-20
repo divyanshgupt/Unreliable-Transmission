@@ -26,7 +26,12 @@ def presynaptic_trace(input_trains, args):
   trace_2 = torch.zeros((nb_trains, nb_timesteps), device=device, dtype=dtype)
 
   for t in range(nb_timesteps - 1):
-    trace_1[:, t+1] = trace_1[:, t] + (-trace_1[:, t]/t_rise + input_trains[:, t])*dt
-    trace_2[:, t+1] = trace_2[:, t] + (-trace_2[:, t] + trace_1[:, t])*dt/t_decay
+    
+  #  trace_1[:, t+1] = trace_1[:, t] + (-trace_1[:, t]/t_rise + input_trains[:, t])*dt
+  #  trace_2[:, t+1] = trace_2[:, t] + (-trace_2[:, t] + trace_1[:, t])*dt/t_decay
 
+    # New implementation (cognizant of the dirac delta):
+    trace_1[:, t+1] = trace_1[:, t] + (-trace_1[:, t]/t_rise)*dt + input_trains[:, t]
+    trace_2[:, t+1] = trace_2[:, t] + (-trace_2[:, t] + trace_1[:, t])*dt/t_decay
+  
   return trace_2
