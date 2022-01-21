@@ -37,7 +37,7 @@ args = {'thres': -50,
         'nb_outputs': 1,
         'device': device, # for functions in different modules
         'dtype': dtype,
-        'nb_epochs': 4
+        'nb_epochs': 400
         } 
 
 
@@ -75,7 +75,10 @@ for r_0 in learning_rates:
 
     new_weights, loss_rec, learning_rate_params = functions.train_single_neuron(input_trains, target, weights, r_0, args)
     #r_ij, v_ij, g_ij2 = learning_rate_params
-    
+    #plt.plot(loss_rec)
+    #plt.title("Loss")
+    #plt.show()
+
     data_folder = "data/" + str(datetime.datetime.today())[:10] + ' rate = ' + str(r_0) + '/'
     #os.makedirs(location)
     location = os.path.abspath(data_folder)
