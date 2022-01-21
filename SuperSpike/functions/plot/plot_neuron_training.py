@@ -59,7 +59,8 @@ def plot_learning_rate_params(learning_rate_params, location, args, figsize=[15,
         ax[1].plot(g_ij2_rec[i], label="g_ij2")
         ax[1].legend(loc='best')
         ax[1].set_xlim(0, nb_epochs)
-        ax[1].set_ylim(0, 1e-3)
+    #    ax[1].set_ylim(0, 1e-3)
+        ax[1].autoscale()
         ax[1].set_xlabel('Epochs')
 
         plt.savefig(location + '/neuron ' + str(i) +' learning_rate_params.png')
