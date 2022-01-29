@@ -81,7 +81,7 @@ def run_single_neuron(input_trains, weights, target, args):
   hebbian = A * B # AB.T shape: (nb_inputs, nb_outputs, nb_timesteps)
 
   # eligibility trace
-  eligibility = functions.eligibility_trace(hebbian, args)
+  eligibility = functions.new_eligibility_trace(hebbian, args)
   
   # error signal
   error = functions.new_error_signal(spk_rec, target, args)
