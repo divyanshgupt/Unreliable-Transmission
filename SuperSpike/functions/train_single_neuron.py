@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 from matplotlib import pyplot as plt
-import tqdm
+from tqdm import tqdm
 import functions
 import pickle
 import datetime
@@ -44,7 +44,49 @@ def train_single_neuron(input_trains, target, weights, r_0, args):
     v_ij_rec = torch.zeros((nb_inputs, nb_outputs, nb_epochs), device=device, dtype=dtype)
     r_ij_rec = torch.zeros((nb_inputs, nb_outputs, nb_epochs), device=device, dtype=dtype)
 
-    for i in range(nb_epochs):
+
+    for i in tqdm(range(nb_epochs)):
+        
+        mem_rec, spk_rec, error_rec, eligibility_rec, pre_trace_rec = functions.run_single_neuron(input_trains, weights,
+                                                                                        target, args)
+        loss = functions.new_van_rossum_loss(spk_rec, target, args)
+        loss_rec[i] = loss
+
+        # Weight update
+        weight_updates = torch.sum(error_rec * eligibility_rec, dim=2)
+        assert weight_updates.shape == (nb_inputs, nb_outputs), "wegiht_updates shape incorrect"
+
+        # per-parameter learning rate
+    #   g_ij2 = (error_rec * eligibility_rec)[:, :, -1]**2 # this has a problem 
+        g_ij2 = torch.sum((error_rec*eligibility_rec)**2, dim=2)
+        assert g_ij2.shape == (nb_inputs, nb_outputs), "g_ij2 shape incorrect"
+        # Question 1: Whether to take the value of g_ij at the last timestep in each epoch or to take the sum of its values over all timesteps in the epoch?
+        # Question 2: How to do normalized convolution for error_signal and eligibility_trace?
+
+        v_ij, _ = torch.max(torch.stack([gamma*v_ij, g_ij2], dim=2), dim=2) # shape: (nb_inputs, nb_outputs)
+        assert v_ij.shape == (nb_inputs, nb_outputs), "v_ij shape incorrect"
+        
+        # Evaluate learning rate for this epoch
+        r_ij = r_0 / torch.sqrt(v_ij)   # shape: (nb_inputs, nb_outputs)
+        # Store learning rate information for this epoch for xth weight
+        g_ij2_rec[:, :, i] = g_ij2 
+        v_ij_rec[:, :, i] = v_ij
+        r_ij_rec[:, :, i] = r_ij
+
+     #   rate_med = torch.median(r_ij)
+     #   print("Median Learning Rate:", rate_med)
+     #   rate_mean = torch.mean(r_ij)
+     #   print("Avg. Learning Rate:", rate_mean)
+
+        weights += r_ij * weight_updates
+
+    
+    learning_rate_params = (r_ij_rec, v_ij_rec, g_ij2_rec)
+
+    return weights, loss_rec, learning_rate_params
+        
+    """
+    for i in tqdm(range(nb_epochs)):
 
         #print("\n Iteration:", i+1)
         mem_rec, spk_rec, error_rec, eligibility_rec, pre_trace_rec = functions.run_single_neuron(input_trains, weights,
@@ -96,6 +138,4 @@ def train_single_neuron(input_trains, target, weights, r_0, args):
 
         weights += r_ij * weight_updates
 
-    learning_rate_params = (r_ij_rec, v_ij_rec, g_ij2_rec)
-
-    return weights, loss_rec, learning_rate_params
+    """

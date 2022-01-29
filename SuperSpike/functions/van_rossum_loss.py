@@ -38,3 +38,41 @@ def van_rossum_loss(output, target, args):
     loss = torch.sum(trace_2**2)*dt
     
     return loss
+
+def new_van_rossum_loss(output, target, args):
+    """
+    Evaluates the van rossum loss over the normalized double-exponential kernel
+    Inputs:
+        output - spiketrain, shape: (nb_steps,)
+        target - spiketrain, shape: (nb_steps,)
+    Returns
+        van Rossum loss (over normalized double exponential error signal)
+    """
+    
+    t_rise = args['t_rise_alpha']
+    t_decay = args['t_decay_alpha']
+    dt = args['timestep_size']
+    nb_timesteps = args['nb_steps']
+    device = args['device']
+    dtype = args['dtype']
+
+    difference = target - output
+    # print(difference.shape)
+
+    time_array = torch.arange(0, nb_timesteps*dt, dt, dtype=dtype, device=device)
+
+    # create a model trace for a single spike at t=0, shape:(nb_timesteps)
+    model_trace = (1/(t_rise-t_decay))*(torch.exp(-time_array/t_rise) - torch.exp(-time_array/t_decay))
+
+    final_trace = torch.zeros(nb_timesteps, device=device, dtype=dtype)
+
+    for t in range(nb_timesteps):
+
+        if difference[t] == 1:
+            final_trace[t:] += model_trace[:nb_timesteps - t]
+        elif difference[t] == -1:
+            final_trace[t:] -= model_trace[:nb_timesteps - t]
+
+    loss = torch.sum(final_trace**2)*dt
+    
+    return loss

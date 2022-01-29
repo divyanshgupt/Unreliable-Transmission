@@ -7,7 +7,7 @@ import functions
 #import functions.plot
 import datetime
 import json # To save simulation parameters in a text file
-import pdb
+#import pdb
 import pickle
 
 # set device
@@ -37,7 +37,7 @@ args = {'thres': -50,
         'nb_outputs': 1,
         'device': device, # for functions in different modules
         'dtype': dtype,
-        'nb_epochs': 400
+        'nb_epochs': 1000
         } 
 
 
@@ -68,16 +68,21 @@ target[:: nb_steps//5] = 1
 weights = functions.initialize_weights(nb_inputs, nb_outputs, args, scale=80) # initialize weights
 
 # v_ij = 1e-2*torch.zeros((nb_inputs, nb_outputs), device=device, dtype=dtype)
-learning_rates = np.array([10, 5, 1, 0.5, 0.1]) * 1e-3
+#learning_rates = np.array([10, 5, 1, 0.5, 0.1]) * 1e-3
+
+learning_rates = np.array([5, 1, 10, 0.5, 0.1]) * 1e-3
+#learning_rates = learning_rates[::-1]
 
 for r_0 in learning_rates:
     #r_0 = 5e-3 # basal learning rate
-
+    print("Learning rate =", r_0)
     new_weights, loss_rec, learning_rate_params = functions.train_single_neuron(input_trains, target, weights, r_0, args)
     #r_ij, v_ij, g_ij2 = learning_rate_params
-    #plt.plot(loss_rec)
-    #plt.title("Loss")
-    #plt.show()
+    plt.plot(loss_rec[1:])
+    plt.title("Loss, learning-rate = " + str(r_0))
+    plt.show()
+
+    """
 
     data_folder = "data/" + str(datetime.datetime.today())[:10] + ' rate = ' + str(r_0) + '/'
     #os.makedirs(location)
@@ -92,6 +97,7 @@ for r_0 in learning_rates:
     #location = ''
     #location = os.path.cudir()
     # Store parameters (in dict args) in the given location
+    
     functions.plot.plot_loss(loss_rec, location, args) # Saves the loss-over-epochs plot in the given location
     functions.plot.plot_learning_rate_params(learning_rate_params, location, args)
 
@@ -116,7 +122,7 @@ for r_0 in learning_rates:
    # json.dump(args, args_file)
     args_file = open(file_name, 'a')
     args_file.write(str(args))
-
+    """
 
 """plt.plot(loss_rec)
 plt.title("Loss over epochs")
