@@ -37,7 +37,7 @@ args = {'thres': -50,
         'nb_outputs': 1,
         'device': device, # for functions in different modules
         'dtype': dtype,
-        'nb_epochs': 1000
+        'nb_epochs': 1600
         } 
 
 
@@ -65,7 +65,9 @@ input_trains = functions.poisson_trains(100, spk_freq*np.ones(100), args)
 target = torch.zeros(nb_steps, device=device, dtype=dtype)
 target[:: nb_steps//5] = 1
 
-weights = functions.initialize_weights(nb_inputs, nb_outputs, args, scale=80) # initialize weights
+#weights = functions.initialize_weights(nb_inputs, nb_outputs, args, scale=80) # initialize weights
+
+weights = functions.new_initialize_weights(nb_inputs, nb_outputs, args)
 
 # v_ij = 1e-2*torch.zeros((nb_inputs, nb_outputs), device=device, dtype=dtype)
 #learning_rates = np.array([10, 5, 1, 0.5, 0.1]) * 1e-3
@@ -78,7 +80,7 @@ for r_0 in learning_rates:
     print("Learning rate =", r_0)
     new_weights, loss_rec, learning_rate_params = functions.train_single_neuron(input_trains, target, weights, r_0, args)
     #r_ij, v_ij, g_ij2 = learning_rate_params
-    plt.plot(loss_rec[1:])
+    plt.plot(loss_rec)
     plt.title("Loss, learning-rate = " + str(r_0))
     plt.show()
 

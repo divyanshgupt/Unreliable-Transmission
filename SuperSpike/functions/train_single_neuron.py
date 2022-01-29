@@ -36,7 +36,7 @@ def train_single_neuron(input_trains, target, weights, r_0, args):
 
     loss_rec = np.zeros(nb_epochs)
 
-    v_ij = torch.zeros((nb_inputs, nb_outputs), device=device, dtype=dtype)
+    v_ij = 1e-5*torch.ones((nb_inputs, nb_outputs), device=device, dtype=dtype)
     gamma = float(np.exp(-dt/args['tau_rms']))
 
 
@@ -51,7 +51,7 @@ def train_single_neuron(input_trains, target, weights, r_0, args):
                                                                                         target, args)
         loss = functions.new_van_rossum_loss(spk_rec, target, args)
         loss_rec[i] = loss
-
+        print("Loss =", loss)
         # Weight update
         weight_updates = torch.sum(error_rec * eligibility_rec, dim=2)
         assert weight_updates.shape == (nb_inputs, nb_outputs), "wegiht_updates shape incorrect"
@@ -59,11 +59,13 @@ def train_single_neuron(input_trains, target, weights, r_0, args):
         # per-parameter learning rate
     #   g_ij2 = (error_rec * eligibility_rec)[:, :, -1]**2 # this has a problem 
         g_ij2 = torch.sum((error_rec*eligibility_rec)**2, dim=2)
+    #    g_ij2[g_ij2 <= 1e-5] 
         assert g_ij2.shape == (nb_inputs, nb_outputs), "g_ij2 shape incorrect"
         # Question 1: Whether to take the value of g_ij at the last timestep in each epoch or to take the sum of its values over all timesteps in the epoch?
         # Question 2: How to do normalized convolution for error_signal and eligibility_trace?
 
-        v_ij, _ = torch.max(torch.stack([gamma*v_ij, g_ij2], dim=2), dim=2) # shape: (nb_inputs, nb_outputs)
+        #v_ij, _ = torch.max(torch.stack([gamma*v_ij, g_ij2], dim=2), dim=2) # shape: (nb_inputs, nb_outputs)
+        v_ij = torch.max(gamma*v_ij, g_ij2)
         assert v_ij.shape == (nb_inputs, nb_outputs), "v_ij shape incorrect"
         
         # Evaluate learning rate for this epoch
@@ -73,10 +75,10 @@ def train_single_neuron(input_trains, target, weights, r_0, args):
         v_ij_rec[:, :, i] = v_ij
         r_ij_rec[:, :, i] = r_ij
 
-     #   rate_med = torch.median(r_ij)
-     #   print("Median Learning Rate:", rate_med)
-     #   rate_mean = torch.mean(r_ij)
-     #   print("Avg. Learning Rate:", rate_mean)
+        rate_med = torch.median(r_ij)
+        print("Median Learning Rate:", rate_med)
+        rate_mean = torch.mean(r_ij)
+        print("Avg. Learning Rate:", rate_mean)
 
         weights += r_ij * weight_updates
 

@@ -20,6 +20,22 @@ def initialize_weights(nb_inputs, nb_outputs, args, scale=70):
     weights = torch.empty((nb_inputs, nb_outputs), device=device, dtype=dtype)
     weights = torch.nn.init.normal_(weights, mean=0.5, std=weight_scale/np.sqrt(nb_inputs))
     print("Weight initialization done")
+
+
+    return weights
+
+def new_initialize_weights(nb_inputs, nb_outputs, args):
+    device = args['device']
+    dtype = args['dtype']
+
+    mean = 0 * torch.ones((nb_inputs, nb_outputs), device=device, dtype=dtype)
+    std = torch.ones((nb_inputs, nb_outputs), device=device, dtype=dtype)
+
+    #weights = torch.normal(mean, std, device=device, dtype=dtype)
+    weights = torch.normal(mean, std)
+
+    print("Weight Initialization Done")
+
     return weights
 
 def initialize_weights_multilayer(nb_inputs, nb_hidden, nb_outputs, args, weight_scale=70):
