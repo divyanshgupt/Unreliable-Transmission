@@ -63,7 +63,7 @@ input_trains = functions.poisson_trains(100, spk_freq*np.ones(100), args)
 
 # Create Target Train
 target = torch.zeros(nb_steps, device=device, dtype=dtype)
-target[:: nb_steps//5] = 1
+target[500:: nb_steps//5] = 1
 
 #weights = functions.initialize_weights(nb_inputs, nb_outputs, args, scale=80) # initialize weights
 
