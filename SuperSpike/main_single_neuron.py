@@ -15,9 +15,13 @@ dtype = torch.float
 cpu = torch.device("cpu")
 gpu = torch.device("cuda:0")
 
+
 device = cpu
 # Uncomment the line below to run on GPU
 #device = gpu
+
+torch.manual_seed(0)
+np.random.seed(0)
 
 
 # Set parameters
@@ -84,9 +88,9 @@ for r_0 in learning_rates:
     plt.title("Loss, learning-rate = " + str(r_0))
     plt.show()
 
-    """
 
-    data_folder = "data/" + str(datetime.datetime.today())[:10] + ' rate = ' + str(r_0) + '/'
+    """
+    data_folder = "data/" h+ str(datetime.datetime.today())[:10] + ' rate = ' + str(r_0) + '/'
     #os.makedirs(location)
     location = os.path.abspath(data_folder)
     location = os.path.join(os.getcwd(), location)

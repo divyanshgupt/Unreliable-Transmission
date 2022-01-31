@@ -36,7 +36,9 @@ def train_single_neuron(input_trains, target, weights, r_0, args):
 
     loss_rec = np.zeros(nb_epochs)
 
-    v_ij = 1e-5*torch.ones((nb_inputs, nb_outputs), device=device, dtype=dtype)
+    v_ij = 1e-8*torch.ones((nb_inputs, nb_outputs), device=device, dtype=dtype)
+    print("Initial v_ij coeff = 1e-8")
+   # v_ij = torch.zeros((nb_inputs, nb_outputs), device=device, dtype=dtype)
     gamma = float(np.exp(-dt/args['tau_rms']))
 
 
@@ -59,6 +61,10 @@ def train_single_neuron(input_trains, target, weights, r_0, args):
         # per-parameter learning rate
     #   g_ij2 = (error_rec * eligibility_rec)[:, :, -1]**2 # this has a problem 
         g_ij2 = torch.sum((error_rec*eligibility_rec)**2, dim=2)
+     #   print("NaN values:", g_ij2[g_ij2 != g_ij2])
+     #   print("Zeros:", g_ij2[g_ij2==0])
+      #  g_ij2[g_ij2 == 0] = 1
+        
     #    g_ij2[g_ij2 <= 1e-5] 
         assert g_ij2.shape == (nb_inputs, nb_outputs), "g_ij2 shape incorrect"
         # Question 1: Whether to take the value of g_ij at the last timestep in each epoch or to take the sum of its values over all timesteps in the epoch?
