@@ -74,7 +74,6 @@ target[500:: nb_steps//5] = 1
 
 #weights = functions.initialize_weights(nb_inputs, nb_outputs, args, scale=80) # initialize weights
 
-weights = functions.new_initialize_weights(nb_inputs, nb_outputs, args)
 
 # v_ij = 1e-2*torch.zeros((nb_inputs, nb_outputs), device=device, dtype=dtype)
 #learning_rates = np.array([10, 5, 1, 0.5, 0.1]) * 1e-3
@@ -85,9 +84,9 @@ learning_rates = np.array([5, 1, 10, 0.5, 0.1]) * 1e-3
 for r_0 in learning_rates:
     #r_0 = 5e-3 # basal learning rate
     print("Learning rate =", r_0)
-
     loss_rec = np.zeros((nb_trials, nb_epochs))
     for i in range(nb_trials):
+        weights = functions.new_initialize_weights(nb_inputs, nb_outputs, args)
         new_weights, loss_rec[i], learning_rate_params = functions.train_single_neuron(input_trains, target, weights, r_0, args)
         #r_ij, v_ij, g_ij2 = learning_rate_params
         plt.plot(loss_rec[i], alpha=0.6)
