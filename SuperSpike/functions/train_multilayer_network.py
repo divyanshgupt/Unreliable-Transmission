@@ -29,6 +29,9 @@ def train_multilayer_network(input_trains, w1, w2, feedback_weights, target, r_0
 
     loss_rec = np.zeros(nb_epochs)
 
+    v_ij_1 = 1e-10*torch.ones((nb_inputs, nb_hidden), device=device, dtype=dtype)
+    v_ij_2 = 1e-10*torch.ones((nb_hidden, nb_outputs), device=device, dtype=dtype)
+
     for i in tqdm(range(nb_epochs)):
         print("Epoch no:", i)
         eligibility_1, eligibility_2, presynaptic_trace_1, presynaptic_traces_2, spk_rec_2, spk_rec_1, mem_rec_2, mem_rec_1 = functions.run_multilayer_network(input_trains, w1, w2, args)
