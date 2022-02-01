@@ -49,7 +49,7 @@ def run_multilayer_network(input_trains, w1, w2, args):
     # for t in tqdm(range(nb_steps)):
     #   print("\n", "Timestep:", t)
         # Spike
-        out_1 = functions.spike_fn(mem_1, thres)
+        out_1 = functions.spike_fn(mem_1, thres, args)
         spk_rec_1.append(out_1)
         inp_2 = out_1 # input to the next layer, shape: (nb_hidden,)
 
@@ -94,7 +94,7 @@ def run_multilayer_network(input_trains, w1, w2, args):
                 reset_2[j] = 0
 
         # evaluating new membrane potential and synaptic input
-        out_2 = functions.spike_fn(mem_2, thres)
+        out_2 = functions.spike_fn(mem_2, thres, args)
         spk_rec_2.append(out_2)
     #  print("Network Output:", out_2)
     #  print("Spk_Rec 2:", spk_rec_2)
@@ -117,9 +117,9 @@ def run_multilayer_network(input_trains, w1, w2, args):
 
     # Presynaptic Traces
     ## At hidden layer: 
-    presynaptic_traces_1 = functions.presynaptic_trace(input_trains, args) #final_shape: (nb_inputs, nb_steps)
+    presynaptic_traces_1 = functions.new_presynaptic_trace(input_trains, args) #final_shape: (nb_inputs, nb_steps)
     ## At output layer: 
-    presynaptic_traces_2 = functions.presynaptic_trace(spk_rec_1, args) #final_shape: (nb_hidden, nb_steps)
+    presynaptic_traces_2 = functions.new_presynaptic_trace(spk_rec_1, args) #final_shape: (nb_hidden, nb_steps)
 
     # Hebbian Coincidence Term:
     ## At hidden layer:
@@ -138,8 +138,8 @@ def run_multilayer_network(input_trains, w1, w2, args):
 
     # Eligibility Trace (double exponential kernel over the hebbian coincidence term)
     ## At hidden layer:
-    eligibility_1 = functions.eligibility_trace(hebbian_1, args) #final_shape: (nb_inputs, nb_hidden, nb)
+    eligibility_1 = functions.new_eligibility_trace(hebbian_1, args) #final_shape: (nb_inputs, nb_hidden, nb)
     ## At output layer:
-    eligibility_2 = functions.eligibility_trace(hebbian_2, args) #final_shape: (nb_hidden, nb_outputs, nb_steps)
+    eligibility_2 = functions.new_eligibility_trace(hebbian_2, args) #final_shape: (nb_hidden, nb_outputs, nb_steps)
 
     return eligibility_1, eligibility_2, presynaptic_traces_1, presynaptic_traces_2, spk_rec_2, spk_rec_1, mem_rec_2, mem_rec_1

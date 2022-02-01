@@ -65,4 +65,33 @@ def initialize_weights_multilayer(nb_inputs, nb_hidden, nb_outputs, args, weight
 
     return w1, w2
 
-    
+
+def new_initialize_weights_multilayer(nb_inputs, nb_hidden, nb_outputs, args):
+    """
+    Inputs:
+        nb_inputs
+        nb_hidden
+        nb_outputs
+        args
+        weight_scale
+
+    Returns:
+        w1 - shape:(nb_inputs, nb_hidden)
+        w2 - shape:(nb_hidden, nb_outputs)
+    """
+
+    device = args['device']
+    dtype = args['dtype']
+    nb_inputs = args['nb_inputs']
+    nb_hidden = args['nb_hidden']
+    nb_outputs = args['nb_outputs']
+
+    mean_1 = 0*torch.ones((nb_inputs, nb_hidden), device=device, dtype=dtype)
+    std_1 = torch.ones((nb_inputs, nb_hidden), device=device, dtype=dtype)
+    mean_2 = 0*torch.ones((nb_hidden, nb_outputs), device=device, dtype=dtype)
+    std_2 = torch.ones((nb_hidden, nb_outputs), device=device, dtype=dtype)
+
+    w1 = torch.normal(mean_1, std_1).to(device)
+    w2 = torch.normal(mean_2, std_2).to(device)
+
+    return w1, w2

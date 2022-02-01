@@ -56,7 +56,7 @@ def new_eligibility_trace(hebbian, args):
   device = args['device']
   dtype = args['dtype']
   
-  nb_inputs = hebbian.shape[0]
+  nb_inputs = hebbian.shape[0] # inferring from hebbian shape is to ensure that the shape(input x output) generalizes for multilayer network
   nb_outputs = hebbian.shape[1]
 
   trace_1 = torch.zeros((nb_inputs, nb_outputs, nb_timesteps), device=device,

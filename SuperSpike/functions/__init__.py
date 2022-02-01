@@ -11,6 +11,7 @@ from .train_single_neuron import *
 # specific to multi_layer_networks:
 from .run_multilayer_network import *
 from .random_feedback import *
+from .train_multilayer_network import *
 
 # plotting sub-package
 from .plot import *
