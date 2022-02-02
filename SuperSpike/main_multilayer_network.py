@@ -20,6 +20,7 @@ args = {'thres': -50,
         'tau_mem': 1e-2,
         'tau_syn': 5e-3,
         'tau_ref': 5e-3,
+        'tau_het': 5e-3, # regulation term time constant (pure guess)
         't_rise': 5e-3, # the pre-synaptic double exponential kernel rise time
         't_decay': 1e-2, # the pre-synaptic double exponential kernel decay time
         'timestep_size': 1e-4, # 0.1 msec
