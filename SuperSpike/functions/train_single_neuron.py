@@ -36,7 +36,7 @@ def train_single_neuron(input_trains, target, weights, r_0, args):
 
     loss_rec = np.zeros(nb_epochs)
 
-    v_ij = 1e-8*torch.ones((nb_inputs, nb_outputs), device=device, dtype=dtype)
+    v_ij = 1e-20*torch.ones((nb_inputs, nb_outputs), device=device, dtype=dtype)
     print("Initial v_ij coeff = 1e-8")
    # v_ij = torch.zeros((nb_inputs, nb_outputs), device=device, dtype=dtype)
     gamma = float(np.exp(-dt/args['tau_rms']))

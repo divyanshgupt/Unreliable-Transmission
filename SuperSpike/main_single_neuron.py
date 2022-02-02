@@ -49,7 +49,7 @@ args = {'thres': -50,
 nb_inputs = args['nb_inputs']
 nb_outputs = args['nb_outputs']
 
-nb_trials = 20
+nb_trials = 10
 nb_epochs = args['nb_epochs']
 
 nb_steps = args['nb_steps']
@@ -85,13 +85,14 @@ for r_0 in learning_rates:
     #r_0 = 5e-3 # basal learning rate
     print("Learning rate =", r_0)
     loss_rec = np.zeros((nb_trials, nb_epochs))
+    plt.figure(dpi=130)
     for i in range(nb_trials):
         weights = functions.new_initialize_weights(nb_inputs, nb_outputs, args)
         new_weights, loss_rec[i], learning_rate_params = functions.train_single_neuron(input_trains, target, weights, r_0, args)
         #r_ij, v_ij, g_ij2 = learning_rate_params
         plt.plot(loss_rec[i], alpha=0.6)
 
-    plt.plot(np.mean(loss_rec, axis=1), alpha=1, color='black')
+    plt.plot(np.mean(loss_rec, axis=0), alpha=1, color='black')
     plt.title("Loss, learning-rate = " + str(r_0))
     plt.xlabel("Epochs")
  #   plt.show()
