@@ -24,6 +24,7 @@ def train_multilayer_network(input_trains, w1, w2, feedback_weights, target, r_0
     dt = args['timestep_size']
     nb_steps = args['nb_steps']
     nb_epochs = args['nb_epochs']
+    rho = args['rho'] # regularization strength
 
     gamma = float(np.exp(-dt/args['tau_rms']))
 
@@ -77,9 +78,12 @@ def train_multilayer_network(input_trains, w1, w2, feedback_weights, target, r_0
         w2_change = torch.sum(output_error.T * eligibility_2, dim=2) # sum along time dimension; final shape: (nb_hidden, nb_outputs)
         w1_change = torch.sum(feedback_error.T * eligibility_1, dim=2) # final shape: (nb_inputs, nb_hidden)
 
+        regularization_1 = functions.heterosynaptic_regularization(spk_rec_1, args) # shape: (nb_hidden,)
+        regularization_2 = functions.heterosynaptic_regularization(spk_rec_2, args) # shape: (nb_outputs,)
+
         # Update Weights:
-        w1 += w1_change * learning_rate_1 
-        w2 += w2_change * learning_rate_2
+        w1 += (w1_change * learning_rate_1) - rho*(w1*regularization_1)
+        w2 += (w2_change * learning_rate_2) - rho*(w2*regularization_2)
 
         rate_med_1 = torch.median(learning_rate_1)
         rate_mean_1 = torch.mean(learning_rate_1)

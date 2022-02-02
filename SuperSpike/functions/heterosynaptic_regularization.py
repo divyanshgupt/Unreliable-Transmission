@@ -18,7 +18,7 @@ def heterosynaptic_regularization(activity, args):
     nb_steps = args['nb_steps']
     dt = args['timestep_size']
     tau_het = args['tau_het']
-    rho = args['rho'] # regularization strength
+    a = args['a'] # exponent parameter for regularization evalution
 
     nb_outputs = activity.shape[0]
 
@@ -31,7 +31,7 @@ def heterosynaptic_regularization(activity, args):
         indices = activity >= 1
         regularization[indices, t:] += model_trace[nb_steps - t]
 
-    regularization = torch.sum(regularization, dim=1)*dt # simple first order Euler integration method
+    regularization = torch.sum(regularization**a, dim=1)*dt # simple first order Euler integration method
 
     assert regularization.shape == (nb_outputs,), "Regularization term shape incorrect"
 

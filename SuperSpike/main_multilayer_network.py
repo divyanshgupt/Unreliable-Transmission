@@ -30,7 +30,9 @@ args = {'thres': -50,
         'nb_inputs': 100,
         'nb_hidden': 4,
         'nb_outputs': 1,
-        'nb_epochs': 100
+        'nb_epochs': 100,
+        'rho': 1, # regularization strength
+        'a': 4 # exponent parameter for regularization evaluation
         } 
     
 args['device'] = device

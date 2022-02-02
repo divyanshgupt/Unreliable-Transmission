@@ -12,6 +12,7 @@ from .train_single_neuron import *
 from .run_multilayer_network import *
 from .random_feedback import *
 from .train_multilayer_network import *
+from .heterosynaptic_regularization import *
 
 # plotting sub-package
 from .plot import *
