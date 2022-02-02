@@ -28,8 +28,8 @@ def heterosynaptic_regularization(activity, args):
     model_trace = torch.exp(-time_array/tau_het).to(device)
 
     for t in range(nb_steps):
-        indices = activity >= 1
-        regularization[indices, t:] += model_trace[nb_steps - t]
+        indices = activity[:, t] >= 1
+        regularization[indices, t:] += model_trace[:nb_steps - t]
 
     regularization = torch.sum(regularization**a, dim=1)*dt # simple first order Euler integration method
 
