@@ -70,10 +70,6 @@ w1, w2 = functions.new_initialize_weights_multilayer(nb_inputs, nb_hidden, nb_ou
 feedback_weights = functions.random_feedback(nb_hidden, nb_outputs, args).T # shape: (nb_outputs, nb_hidden)
 loss_rec = []
 
-v_ij_1 = 1e-10*torch.ones((nb_inputs, nb_hidden), device=device, dtype=dtype)
-v_ij_2 = 1e-10*torch.ones((nb_hidden, nb_outputs), device=device, dtype=dtype)
-
-
 gamma = float(np.exp(-dt/args['tau_rms']))
 
 learning_rates = np.array([5, 1, 10, 0.5, 0.1]) * 1e-3
@@ -87,16 +83,11 @@ for r_0 in learning_rates:
   plt.title("Loss over epochs, learning rate = " + str(r_0))
   plt.show()
 
-
-
-
-
-
-
+"""
 # Store the learned weights
 learned_weights = w1, w2
 file_name = "weights " + str(datetime.datetime.now())
 weight_file = open(file_name, 'w')
 pickle.dump(learned_weights, weight_file)
 
-
+"""

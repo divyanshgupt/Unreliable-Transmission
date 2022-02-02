@@ -81,4 +81,15 @@ def train_multilayer_network(input_trains, w1, w2, feedback_weights, target, r_0
         w1 += w1_change * learning_rate_1 
         w2 += w2_change * learning_rate_2
 
+        rate_med_1 = torch.median(learning_rate_1)
+        rate_mean_1 = torch.mean(learning_rate_1)
+        print("Learning rate 1: Median =", rate_med_1)
+        print("Learning rate 1: Mean =", rate_mean_1)
+        
+        rate_med_2 = torch.median(learning_rate_2)
+        rate_mean_2 = torch.mean(learning_rate_2)
+        print("Learning rate 2: Median =", rate_med_2)
+        print("Learning rate 2: Mean =", rate_mean_2)
+
+
     return w1, w2, loss_rec
