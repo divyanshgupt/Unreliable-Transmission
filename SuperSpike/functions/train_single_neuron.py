@@ -36,7 +36,9 @@ def train_single_neuron(input_trains, target, weights, r_0, args):
 
     loss_rec = np.zeros(nb_epochs)
 
-    v_ij = 1e-20*torch.ones((nb_inputs, nb_outputs), device=device, dtype=dtype)
+    v_ij = 1e-10*torch.ones((nb_inputs, nb_outputs), device=device, dtype=dtype)
+    epsilon = 1e-10
+    print("Epsilon =", epsilon)
     print("Initial v_ij coeff = 1e-8")
    # v_ij = torch.zeros((nb_inputs, nb_outputs), device=device, dtype=dtype)
     gamma = float(np.exp(-dt/args['tau_rms']))
@@ -75,7 +77,7 @@ def train_single_neuron(input_trains, target, weights, r_0, args):
         assert v_ij.shape == (nb_inputs, nb_outputs), "v_ij shape incorrect"
         
         # Evaluate learning rate for this epoch
-        r_ij = r_0 / torch.sqrt(v_ij)   # shape: (nb_inputs, nb_outputs)
+        r_ij = r_0 / torch.sqrt(v_ij + epsilon)   # shape: (nb_inputs, nb_outputs)
         # Store learning rate information for this epoch for xth weight
         g_ij2_rec[:, :, i] = g_ij2 
         v_ij_rec[:, :, i] = v_ij
