@@ -37,7 +37,7 @@ def train_single_neuron(input_trains, target, weights, r_0, args):
     loss_rec = np.zeros(nb_epochs)
 
     v_ij = 1e-10*torch.ones((nb_inputs, nb_outputs), device=device, dtype=dtype)
-    epsilon = 1e-10
+    epsilon = args['epsilon']
     print("Epsilon =", epsilon)
     print("Initial v_ij coeff = 1e-8")
    # v_ij = torch.zeros((nb_inputs, nb_outputs), device=device, dtype=dtype)

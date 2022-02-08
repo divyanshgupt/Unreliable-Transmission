@@ -41,7 +41,8 @@ args = {'thres': -50,
         'nb_outputs': 1,
         'device': device, # for functions in different modules
         'dtype': dtype,
-        'nb_epochs': 1600
+        'nb_epochs': 1600,
+        'epsilon': 1e-5 # noise term for learning rate
         } 
 
 
@@ -85,15 +86,16 @@ for r_0 in learning_rates:
     #r_0 = 5e-3 # basal learning rate
     print("Learning rate =", r_0)
     loss_rec = np.zeros((nb_trials, nb_epochs))
-    plt.figure(dpi=130)
+    plt.figure(dpi=150)
     for i in range(nb_trials):
         weights = functions.new_initialize_weights(nb_inputs, nb_outputs, args)
         new_weights, loss_rec[i], learning_rate_params = functions.train_single_neuron(input_trains, target, weights, r_0, args)
         #r_ij, v_ij, g_ij2 = learning_rate_params
         plt.plot(loss_rec[i], alpha=0.6)
 
-    plt.plot(np.mean(loss_rec, axis=0), alpha=1, color='black')
-    plt.title("Loss, learning-rate = " + str(r_0))
+    plt.plot(np.mean(loss_rec, axis=0), alpha=1, color='black', label="Avg. Loss")
+    plt.legend()
+    plt.title("Loss, learning-rate = " + str(r_0) + ", epsilon = " + args['epsilon'])
     plt.xlabel("Epochs")
  #   plt.show()
     data_folder = "data/" + str(datetime.datetime.today())[:10] + ' rate = ' + str(r_0) + '/'
@@ -101,7 +103,7 @@ for r_0 in learning_rates:
     location = os.path.join(os.getcwd(), location)
     os.makedirs(location)
 
-    plt.savefig(location + "loss over epochs.jpg")
+    plt.savefig(location + "/loss over epochs.jpg")
 
     """
     data_folder = "data/" h+ str(datetime.datetime.today())[:10] + ' rate = ' + str(r_0) + '/'
