@@ -87,6 +87,7 @@ for r_0 in learning_rates:
     print("Learning rate =", r_0)
     loss_rec = np.zeros((nb_trials, nb_epochs))
     plt.figure(dpi=150)
+
     for i in range(nb_trials):
         weights = functions.new_initialize_weights(nb_inputs, nb_outputs, args)
         new_weights, loss_rec[i], learning_rate_params = functions.train_single_neuron(input_trains, target, weights, r_0, args)
@@ -95,15 +96,20 @@ for r_0 in learning_rates:
 
     plt.plot(np.mean(loss_rec, axis=0), alpha=1, color='black', label="Avg. Loss")
     plt.legend()
-    plt.title("Loss, learning-rate = " + str(r_0) + ", epsilon = " + args['epsilon'])
+    plt.title("Loss, learning-rate = " + str(r_0) + ", epsilon = " + str(args['epsilon']))
     plt.xlabel("Epochs")
  #   plt.show()
+
     data_folder = "data/" + str(datetime.datetime.today())[:10] + ' rate = ' + str(r_0) + '/'
     location = os.path.abspath(data_folder)
     location = os.path.join(os.getcwd(), location)
     os.makedirs(location)
 
     plt.savefig(location + "/loss over epochs.jpg")
+
+    loss_file_name = location + "/loss_rec epsilon= " + str(args['epsilon']) + "learning_rate = " + str(r_0)
+    loss_file = open(loss_file_name, 'wb')
+    pickle.dump(loss_rec, loss_file)
 
     """
     data_folder = "data/" h+ str(datetime.datetime.today())[:10] + ' rate = ' + str(r_0) + '/'
