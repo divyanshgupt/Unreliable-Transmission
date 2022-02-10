@@ -54,7 +54,7 @@ def train_single_neuron(input_trains, target, weights, r_0, args):
         mem_rec, spk_rec, error_rec, eligibility_rec, pre_trace_rec = functions.run_single_neuron(input_trains, weights,
                                                                                         target, args)
         loss = functions.new_van_rossum_loss(spk_rec, target, args)
-        loss_rec[i] = loss
+        loss_rec[i] = loss.to('cpu')
         print("Loss =", loss)
         # Weight update
         weight_updates = torch.sum(error_rec * eligibility_rec, dim=2)
