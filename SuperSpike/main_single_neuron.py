@@ -36,13 +36,13 @@ args = {'thres': -50,
         't_rise_alpha': 5e-3,
         't_decay_alpha': 1e-2,
         'nb_steps': 5000,
-        'tau_rms': 5e-3, # this is a guess and might need changing
+        'tau_rms': 2e-4, # this is a guess and might need changing
         'nb_inputs': 100,
         'nb_outputs': 1,
         'device': device, # for functions in different modules
         'dtype': dtype,
         'nb_epochs': 1600,
-        'epsilon': 1e-2 # noise term for learning rate
+        'epsilon': 1 # noise term for learning rate
         } 
 
 
@@ -50,7 +50,7 @@ args = {'thres': -50,
 nb_inputs = args['nb_inputs']
 nb_outputs = args['nb_outputs']
 
-nb_trials = 10
+nb_trials = 3
 nb_epochs = args['nb_epochs']
 
 nb_steps = args['nb_steps']
@@ -66,7 +66,7 @@ args['alpha'] = alpha
 args['beta'] = beta
 
 #input trains
-spk_freq = 10 # not sure about this, but assuming it since the paper uses 10 Hz frequency as the target output frequency (actually, 5 equidistant spikes over 500 ms)
+spk_freq = 15 # not sure about this, but assuming it since the paper uses 10 Hz frequency as the target output frequency (actually, 5 equidistant spikes over 500 ms)
 input_trains = functions.poisson_trains(100, spk_freq*np.ones(100), args)
 
 # Create Target Train
@@ -96,7 +96,7 @@ for r_0 in learning_rates:
 
     plt.plot(np.mean(loss_rec, axis=0), alpha=1, color='black', label="Avg. Loss")
     plt.legend()
-    plt.title("Loss, learning-rate = " + str(r_0) + ", epsilon = " + str(args['epsilon']))
+    plt.title("Loss, learning-rate = " + str(r_0) + ", epsilon = " + str(args['epsilon']) + "spike freq = " + str(spk_freq))
     plt.xlabel("Epochs")
  #   plt.show()
 
@@ -105,11 +105,19 @@ for r_0 in learning_rates:
     location = os.path.join(os.getcwd(), location)
     os.makedirs(location)
 
-    plt.savefig(location + "/loss over epochs.jpg")
+    plt.savefig(location + "/loss over epochs" + "learning-rate = " + str(r_0) + ", epsilon = " + str(args['epsilon']) + "spike freq = " + str(spk_freq) + ".jpg")
 
-    loss_file_name = location + "/loss_rec epsilon= " + str(args['epsilon']) + "learning_rate = " + str(r_0)
+    loss_file_name = location + "/loss_rec epsilon= " + str(args['epsilon']) + "learning_rate = " + str(r_0) + "spike freq = " + str(spk_freq)
     loss_file = open(loss_file_name, 'wb')
     pickle.dump(loss_rec, loss_file)
+
+    # Store args:
+    file_name = location + "/args" + str(args['epsilon']) + "learning_rate = " + str(r_0) + "spike freq = " + str(spk_freq)
+   # args_file = open(file_name, 'w')
+   # json.dump(args, args_file)
+    args_file = open(file_name, 'a')
+    args_file.write(str(args))
+    
 
     """
     data_folder = "data/" h+ str(datetime.datetime.today())[:10] + ' rate = ' + str(r_0) + '/'
@@ -144,12 +152,6 @@ for r_0 in learning_rates:
     param_file = open(file_name, 'wb')
     pickle.dump(learning_rate_params, param_file)
 
-    # Store args:
-    file_name = location + "/args" #+ str(datetime.datetime.now())
-   # args_file = open(file_name, 'w')
-   # json.dump(args, args_file)
-    args_file = open(file_name, 'a')
-    args_file.write(str(args))
     """
 
 """plt.plot(loss_rec)
