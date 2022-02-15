@@ -9,6 +9,13 @@ import datetime
 import json # To save simulation parameters in a text file
 #import pdb
 import pickle
+import sys
+
+orig_stdout = sys.stdout
+f = open('out.txt', 'w')
+#sys.stdout = f
+
+
 
 # set device
 dtype = torch.float
@@ -36,13 +43,13 @@ args = {'thres': -50,
         't_rise_alpha': 5e-3,
         't_decay_alpha': 1e-2,
         'nb_steps': 5000,
-        'tau_rms': 2e-4, # this is a guess and might need changing
+        'tau_rms': 10e-4, # this is a guess and might need changing
         'nb_inputs': 100,
         'nb_outputs': 1,
         'device': device, # for functions in different modules
         'dtype': dtype,
-        'nb_epochs': 1600,
-        'epsilon': 1 # noise term for learning rate
+        'nb_epochs': 800,
+        'epsilon': 1e-4 # noise term for learning rate
         } 
 
 
@@ -50,7 +57,7 @@ args = {'thres': -50,
 nb_inputs = args['nb_inputs']
 nb_outputs = args['nb_outputs']
 
-nb_trials = 3
+nb_trials = 10
 nb_epochs = args['nb_epochs']
 
 nb_steps = args['nb_steps']
@@ -66,7 +73,7 @@ args['alpha'] = alpha
 args['beta'] = beta
 
 #input trains
-spk_freq = 15 # not sure about this, but assuming it since the paper uses 10 Hz frequency as the target output frequency (actually, 5 equidistant spikes over 500 ms)
+spk_freq = 10 # not sure about this, but assuming it since the paper uses 10 Hz frequency as the target output frequency (actually, 5 equidistant spikes over 500 ms)
 input_trains = functions.poisson_trains(100, spk_freq*np.ones(100), args)
 
 # Create Target Train
@@ -79,11 +86,12 @@ target[500:: nb_steps//5] = 1
 # v_ij = 1e-2*torch.zeros((nb_inputs, nb_outputs), device=device, dtype=dtype)
 #learning_rates = np.array([10, 5, 1, 0.5, 0.1]) * 1e-3
 
-learning_rates = np.array([5, 1, 10, 0.5, 0.1]) * 1e-3
+learning_rates = np.array([10, 5, 1, 100, 0.5 , 0.1]) * 1e-3
 #learning_rates = learning_rates[::-1]
 
 for r_0 in learning_rates:
     #r_0 = 5e-3 # basal learning rate
+    print(args)
     print("Learning rate =", r_0)
     loss_rec = np.zeros((nb_trials, nb_epochs))
     plt.figure(dpi=150)
@@ -100,7 +108,7 @@ for r_0 in learning_rates:
     plt.xlabel("Epochs")
  #   plt.show()
 
-    data_folder = "data/" + str(datetime.datetime.today())[:10] + ' rate = ' + str(r_0) + '/'
+    data_folder = "data/" + str(datetime.datetime.today())[:13] + ' rate = ' + str(r_0) + '/'
     location = os.path.abspath(data_folder)
     location = os.path.join(os.getcwd(), location)
     os.makedirs(location)
@@ -112,14 +120,16 @@ for r_0 in learning_rates:
     pickle.dump(loss_rec, loss_file)
 
     # Store args:
-    file_name = location + "/args" + str(args['epsilon']) + "learning_rate = " + str(r_0) + "spike freq = " + str(spk_freq)
+    file_name = location + "/args epsilon = " + str(args['epsilon']) + "learning_rate = " + str(r_0) + "spike freq = " + str(spk_freq)
    # args_file = open(file_name, 'w')
    # json.dump(args, args_file)
     args_file = open(file_name, 'a')
     args_file.write(str(args))
     
-
-    """
+sys.stdout = orig_stdout
+f.close()
+   
+"""
     data_folder = "data/" h+ str(datetime.datetime.today())[:10] + ' rate = ' + str(r_0) + '/'
     #os.makedirs(location)
     location = os.path.abspath(data_folder)
