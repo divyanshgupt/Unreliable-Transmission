@@ -57,7 +57,7 @@ args = {'thres': -50,
 nb_inputs = args['nb_inputs']
 nb_outputs = args['nb_outputs']
 
-nb_trials = 1
+nb_trials = 5
 nb_epochs = args['nb_epochs']
 
 nb_steps = args['nb_steps']
