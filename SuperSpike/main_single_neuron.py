@@ -48,7 +48,7 @@ args = {'thres': -50,
         'nb_outputs': 1,
         'device': device, # for functions in different modules
         'dtype': dtype,
-        'nb_epochs': 1600,
+        'nb_epochs': 1000,
         'epsilon': 1e-4 # noise term for learning rate
         } 
 
@@ -87,7 +87,7 @@ target[500:: nb_steps//5] = 1
 #learning_rates = np.array([10, 5, 1, 0.5, 0.1]) * 1e-3
 
 #learning_rates = np.array([5, 1, 10, 0.5 , 0.1]) * 1e-3
-learning_rates = np.array([10, 5]) * 1e-3
+learning_rates = np.array([10]) * 1e-3
 #learning_rates = learning_rates[::-1]
 
 for r_0 in learning_rates:
@@ -119,6 +119,7 @@ for r_0 in learning_rates:
     loss_file_name = location + "/loss_rec epsilon= " + str(args['epsilon']) + "learning_rate = " + str(r_0) + "spike freq = " + str(spk_freq)
     loss_file = open(loss_file_name, 'wb')
     pickle.dump(loss_rec, loss_file)
+    loss_file.close()
 
     # Store args:
     file_name = location + "/args epsilon = " + str(args['epsilon']) + "learning_rate = " + str(r_0) + "spike freq = " + str(spk_freq)
@@ -126,10 +127,12 @@ for r_0 in learning_rates:
    # json.dump(args, args_file)
     args_file = open(file_name, 'a')
     args_file.write(str(args))
+    args_file.close()
     
     recordings_filename = location + "/recordings epsilon= " + str(args['epsilon']) + "learning_rate = " + str(r_0) + "spike freq = " + str(spk_freq)
     recordings_file = open(recordings_filename, 'wb')
     pickle.dump(recordings, recordings_file)
+    recordings_file.close()
 
 sys.stdout = orig_stdout
 #f.close()
