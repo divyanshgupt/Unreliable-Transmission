@@ -12,7 +12,7 @@ import pickle
 import sys
 
 orig_stdout = sys.stdout
-f = open('out.txt', 'w')
+#f = open('out.txt', 'w')
 #sys.stdout = f
 
 
@@ -48,7 +48,7 @@ args = {'thres': -50,
         'nb_outputs': 1,
         'device': device, # for functions in different modules
         'dtype': dtype,
-        'nb_epochs': 800,
+        'nb_epochs': 1000,
         'epsilon': 1e-4 # noise term for learning rate
         } 
 
@@ -57,7 +57,7 @@ args = {'thres': -50,
 nb_inputs = args['nb_inputs']
 nb_outputs = args['nb_outputs']
 
-nb_trials = 10
+nb_trials = 5
 nb_epochs = args['nb_epochs']
 
 nb_steps = args['nb_steps']
@@ -127,7 +127,7 @@ for r_0 in learning_rates:
     args_file.write(str(args))
     
 sys.stdout = orig_stdout
-f.close()
+#pyf.close()
    
 """
     data_folder = "data/" h+ str(datetime.datetime.today())[:10] + ' rate = ' + str(r_0) + '/'
