@@ -94,21 +94,11 @@ def train_single_neuron(input_trains, target, weights, r_0, args):
                 # fig.colorbar(im, )
                 # fig.suptitle("Underlying parameters")
 
-<<<<<<< HEAD
                 """
                 image = torch.vstack((weight_change.flatten(), r_ij.flatten(), g_ij2.flatten(), v_ij.flatten()))
                 image = torch.vstack((weight_change.flatten(), r_ij.flatten()))
                 # print("Image array = ", image)
                 # print(image.shape)
-=======
-
-            #    image = torch.vstack((weight_change.flatten(), r_ij.flatten(), g_ij2.flatten(), v_ij.flatten()))
-            #    image = torch.vstack((weight_change.flatten(), r_ij.flatten()))
-                # image = torch.cat((weight_change.flatten(), r_ij.flatten()), dim=1)
-
-                # # print("Image array = ", image)
-                # # print(image.shape)
->>>>>>> 5a151024b187fb22f38c5a1ef1d8ec888c5340fb
                 
                 # ax = plt.subplot(211)
                 # im = ax.imshow(image, aspect='auto')
@@ -123,7 +113,6 @@ def train_single_neuron(input_trains, target, weights, r_0, args):
 
                 # plt.show()
                 
-<<<<<<< HEAD
                 plt.figure()
                 fig_1, axs = plt.subplots(2, 1, sharex=True, figsize = (15,10), dpi=120)
 
@@ -140,24 +129,6 @@ def train_single_neuron(input_trains, target, weights, r_0, args):
                 axs[1].set_xlim([0, nb_steps])
                 fig_1.show()
                 """
-=======
-                # plt.figure()
-                # fig_1, axs = plt.subplots(2, 1, sharex=True, figsize = (15,10), dpi=120)
-
-                # positions = np.arange(0, nb_steps)
-                # spike_positions_prev = positions[spk_rec[i-1] == 1]
-                # axs[0].eventplot(spike_positions_prev)
-                # axs[0].set_title("Previous Spike Train")
-                # axs[0].set_xlim([0, nb_steps])
-
-                # positions = np.arange(0, nb_steps)
-                # spike_positions_curr = positions[spk_rec[i] == 1]
-                # axs[1].eventplot(spike_positions_curr)
-                # axs[1].set_title("Current Spike Train")
-                # axs[1].set_xlim([0, nb_steps])
-                # fig_1.show()
-
->>>>>>> 5a151024b187fb22f38c5a1ef1d8ec888c5340fb
 
 
 

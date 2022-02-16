@@ -43,12 +43,12 @@ args = {'thres': -50,
         't_rise_alpha': 5e-3,
         't_decay_alpha': 1e-2,
         'nb_steps': 5000,
-        'tau_rms': 3e-4, # this is a guess and might need changing
+        'tau_rms': 10e-4, # this is a guess and might need changing
         'nb_inputs': 100,
         'nb_outputs': 1,
         'device': device, # for functions in different modules
         'dtype': dtype,
-        'nb_epochs': 1000,
+        'nb_epochs': 800,
         'epsilon': 1e-4 # noise term for learning rate
         } 
 
@@ -57,7 +57,7 @@ args = {'thres': -50,
 nb_inputs = args['nb_inputs']
 nb_outputs = args['nb_outputs']
 
-nb_trials = 5
+nb_trials = 1
 nb_epochs = args['nb_epochs']
 
 nb_steps = args['nb_steps']
