@@ -43,12 +43,12 @@ args = {'thres': -50,
         't_rise_alpha': 5e-3,
         't_decay_alpha': 1e-2,
         'nb_steps': 5000,
-        'tau_rms': 10e-4, # this is a guess and might need changing
+        'tau_rms': 5e-4, # this is a guess and might need changing
         'nb_inputs': 100,
         'nb_outputs': 1,
         'device': device, # for functions in different modules
         'dtype': dtype,
-        'nb_epochs': 800,
+        'nb_epochs': 1600,
         'epsilon': 1e-4 # noise term for learning rate
         } 
 
@@ -86,7 +86,8 @@ target[500:: nb_steps//5] = 1
 # v_ij = 1e-2*torch.zeros((nb_inputs, nb_outputs), device=device, dtype=dtype)
 #learning_rates = np.array([10, 5, 1, 0.5, 0.1]) * 1e-3
 
-learning_rates = np.array([5, 1, 10, 0.5 , 0.1]) * 1e-3
+#learning_rates = np.array([5, 1, 10, 0.5 , 0.1]) * 1e-3
+learning_rates = np.array([10, 5]) * 1e-3
 #learning_rates = learning_rates[::-1]
 
 for r_0 in learning_rates:
