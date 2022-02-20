@@ -51,6 +51,9 @@ def train_single_neuron(input_trains, target, weights, r_0, args):
     r_ij_rec = torch.zeros((nb_inputs, nb_outputs, nb_epochs), device=device, dtype=dtype)
 
     spk_rec = torch.empty((nb_epochs, nb_steps), device=device, dtype=dtype)
+    weight_update_rec = torch.empty((nb_epochs, nb_inputs, nb_outputs), device=device, dtype=dtype)
+    weight_change_rec = torch.empty((nb_epochs, nb_inputs, nb_outputs), device=device, dtype=dtype)
+    weight_rec = torch.empty((nb_epochs, nb_inputs, nb_outputs), device=device, dtype=dtype)
 
     for i in tqdm(range(nb_epochs)):
         print("\n Iteration no: ", i)
@@ -91,13 +94,11 @@ def train_single_neuron(input_trains, target, weights, r_0, args):
                 # fig.colorbar(im, )
                 # fig.suptitle("Underlying parameters")
 
-
-            #    image = torch.vstack((weight_change.flatten(), r_ij.flatten(), g_ij2.flatten(), v_ij.flatten()))
-            #    image = torch.vstack((weight_change.flatten(), r_ij.flatten()))
-                # image = torch.cat((weight_change.flatten(), r_ij.flatten()), dim=1)
-
-                # # print("Image array = ", image)
-                # # print(image.shape)
+                """
+                image = torch.vstack((weight_change.flatten(), r_ij.flatten(), g_ij2.flatten(), v_ij.flatten()))
+                image = torch.vstack((weight_change.flatten(), r_ij.flatten()))
+                # print("Image array = ", image)
+                # print(image.shape)
                 
                 # ax = plt.subplot(211)
                 # im = ax.imshow(image, aspect='auto')
@@ -112,28 +113,30 @@ def train_single_neuron(input_trains, target, weights, r_0, args):
 
                 # plt.show()
                 
-                # plt.figure()
-                # fig_1, axs = plt.subplots(2, 1, sharex=True, figsize = (15,10), dpi=120)
+                plt.figure()
+                fig_1, axs = plt.subplots(2, 1, sharex=True, figsize = (15,10), dpi=120)
 
-                # positions = np.arange(0, nb_steps)
-                # spike_positions_prev = positions[spk_rec[i-1] == 1]
-                # axs[0].eventplot(spike_positions_prev)
-                # axs[0].set_title("Previous Spike Train")
-                # axs[0].set_xlim([0, nb_steps])
+                positions = np.arange(0, nb_steps)
+                spike_positions_prev = positions[spk_rec[i-1] == 1]
+                axs[0].eventplot(spike_positions_prev)
+                axs[0].set_title("Previous Spike Train")
+                axs[0].set_xlim([0, nb_steps])
 
-                # positions = np.arange(0, nb_steps)
-                # spike_positions_curr = positions[spk_rec[i] == 1]
-                # axs[1].eventplot(spike_positions_curr)
-                # axs[1].set_title("Current Spike Train")
-                # axs[1].set_xlim([0, nb_steps])
-                # fig_1.show()
-
+                positions = np.arange(0, nb_steps)
+                spike_positions_curr = positions[spk_rec[i] == 1]
+                axs[1].eventplot(spike_positions_curr)
+                axs[1].set_title("Current Spike Train")
+                axs[1].set_xlim([0, nb_steps])
+                fig_1.show()
+                """
 
 
 
         # Weight update
         weight_updates = torch.sum(error_rec * eligibility_rec, dim=2)
         assert weight_updates.shape == (nb_inputs, nb_outputs), "wegiht_updates shape incorrect"
+
+
 
         # per-parameter learning rate
     #   g_ij2 = (error_rec * eligibility_rec)[:, :, -1]**2 # this has a problem 
@@ -169,6 +172,9 @@ def train_single_neuron(input_trains, target, weights, r_0, args):
 
         weights += weight_change
 
+        weight_update_rec[i] = weight_updates   # record weight-update
+        weight_change_rec[i] = weight_change
+        weight_rec[i] = weights # record weights at the end of epoch
         # print("Weight norm = ", torch.norm(weights))
         
 
@@ -176,7 +182,11 @@ def train_single_neuron(input_trains, target, weights, r_0, args):
     
     learning_rate_params = (r_ij_rec, v_ij_rec, g_ij2_rec)
 
-    return weights, loss_rec, learning_rate_params
+    # Store the recordings
+    recordings = (spk_rec, weight_update_rec, weight_change_rec, weight_rec, r_ij_rec, v_ij_rec, g_ij2_rec)
+
+
+    return weights, loss_rec, recordings
         
     """
     for i in tqdm(range(nb_epochs)):

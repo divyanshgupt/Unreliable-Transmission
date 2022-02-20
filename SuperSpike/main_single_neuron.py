@@ -43,7 +43,7 @@ args = {'thres': -50,
         't_rise_alpha': 5e-3,
         't_decay_alpha': 1e-2,
         'nb_steps': 5000,
-        'tau_rms': 10e-4, # this is a guess and might need changing
+        'tau_rms': 5e-4, # this is a guess and might need changing
         'nb_inputs': 100,
         'nb_outputs': 1,
         'device': device, # for functions in different modules
@@ -57,7 +57,7 @@ args = {'thres': -50,
 nb_inputs = args['nb_inputs']
 nb_outputs = args['nb_outputs']
 
-nb_trials = 5
+nb_trials = 1
 nb_epochs = args['nb_epochs']
 
 nb_steps = args['nb_steps']
@@ -86,7 +86,8 @@ target[500:: nb_steps//5] = 1
 # v_ij = 1e-2*torch.zeros((nb_inputs, nb_outputs), device=device, dtype=dtype)
 #learning_rates = np.array([10, 5, 1, 0.5, 0.1]) * 1e-3
 
-learning_rates = np.array([10, 5, 1, 100, 0.5 , 0.1]) * 1e-3
+#learning_rates = np.array([5, 1, 10, 0.5 , 0.1]) * 1e-3
+learning_rates = np.array([10]) * 1e-3
 #learning_rates = learning_rates[::-1]
 
 for r_0 in learning_rates:
@@ -98,7 +99,7 @@ for r_0 in learning_rates:
 
     for i in range(nb_trials):
         weights = functions.new_initialize_weights(nb_inputs, nb_outputs, args)
-        new_weights, loss_rec[i], learning_rate_params = functions.train_single_neuron(input_trains, target, weights, r_0, args)
+        new_weights, loss_rec[i], recordings = functions.train_single_neuron(input_trains, target, weights, r_0, args)
         #r_ij, v_ij, g_ij2 = learning_rate_params
         plt.plot(loss_rec[i], alpha=0.6)
 
@@ -118,6 +119,7 @@ for r_0 in learning_rates:
     loss_file_name = location + "/loss_rec epsilon= " + str(args['epsilon']) + "learning_rate = " + str(r_0) + "spike freq = " + str(spk_freq)
     loss_file = open(loss_file_name, 'wb')
     pickle.dump(loss_rec, loss_file)
+    loss_file.close()
 
     # Store args:
     file_name = location + "/args epsilon = " + str(args['epsilon']) + "learning_rate = " + str(r_0) + "spike freq = " + str(spk_freq)
@@ -125,9 +127,15 @@ for r_0 in learning_rates:
    # json.dump(args, args_file)
     args_file = open(file_name, 'a')
     args_file.write(str(args))
+    args_file.close()
     
+    recordings_filename = location + "/recordings epsilon= " + str(args['epsilon']) + "learning_rate = " + str(r_0) + "spike freq = " + str(spk_freq)
+    recordings_file = open(recordings_filename, 'wb')
+    pickle.dump(recordings, recordings_file)
+    recordings_file.close()
+
 sys.stdout = orig_stdout
-#pyf.close()
+#f.close()
    
 """
     data_folder = "data/" h+ str(datetime.datetime.today())[:10] + ' rate = ' + str(r_0) + '/'
