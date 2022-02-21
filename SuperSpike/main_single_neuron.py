@@ -48,7 +48,7 @@ args = {'thres': -50,
         'nb_outputs': 1,
         'device': device, # for functions in different modules
         'dtype': dtype,
-        'nb_epochs': 1000,
+        'nb_epochs': 800,
         'epsilon': 1e-4 # noise term for learning rate
         } 
 
@@ -57,7 +57,7 @@ args = {'thres': -50,
 nb_inputs = args['nb_inputs']
 nb_outputs = args['nb_outputs']
 
-nb_trials = 1
+nb_trials = 10
 nb_epochs = args['nb_epochs']
 
 nb_steps = args['nb_steps']
@@ -87,7 +87,7 @@ target[500:: nb_steps//5] = 1
 #learning_rates = np.array([10, 5, 1, 0.5, 0.1]) * 1e-3
 
 #learning_rates = np.array([5, 1, 10, 0.5 , 0.1]) * 1e-3
-learning_rates = np.array([10]) * 1e-3
+learning_rates = np.array([30]) * 1e-3
 #learning_rates = learning_rates[::-1]
 
 for r_0 in learning_rates:
@@ -97,9 +97,12 @@ for r_0 in learning_rates:
     loss_rec = np.zeros((nb_trials, nb_epochs))
     plt.figure(dpi=150)
 
+    recordings_list = []
+
     for i in range(nb_trials):
         weights = functions.new_initialize_weights(nb_inputs, nb_outputs, args)
         new_weights, loss_rec[i], recordings = functions.train_single_neuron(input_trains, target, weights, r_0, args)
+        recordings_list.append(recordings)
         #r_ij, v_ij, g_ij2 = learning_rate_params
         plt.plot(loss_rec[i], alpha=0.6)
 
@@ -131,7 +134,7 @@ for r_0 in learning_rates:
     
     recordings_filename = location + "/recordings epsilon= " + str(args['epsilon']) + "learning_rate = " + str(r_0) + "spike freq = " + str(spk_freq)
     recordings_file = open(recordings_filename, 'wb')
-    pickle.dump(recordings, recordings_file)
+    pickle.dump(recordings_list, recordings_file)
     recordings_file.close()
 
 sys.stdout = orig_stdout
