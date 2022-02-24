@@ -5,6 +5,7 @@ import torch
 import datetime
 import pickle
 import functions
+import os
 
 # set device
 dtype = torch.float
@@ -13,7 +14,7 @@ gpu = torch.device("cuda:0")
 
 device = cpu
 # Uncomment the line below to run on GPU
-#device = gpu
+device = gpu
 
 args = {'thres': -50,
         'u_rest': -60,
@@ -27,13 +28,14 @@ args = {'thres': -50,
         't_rise_alpha': 5e-3, # change this
         't_decay_alpha': 1e-2, # change this 
         'nb_steps': 5000, # 0.5 secs in total
-        'tau_rms': 5e-3,
+        'tau_rms': 5e-4,
         'nb_inputs': 100,
         'nb_hidden': 4,
         'nb_outputs': 1,
-        'nb_epochs': 100,
+        'nb_epochs': 1000,
         'rho': 1, # regularization strength
-        'a': 4 # exponent parameter for regularization evaluation
+        'a': 4, # exponent parameter for regularization evaluation
+        'epsilon': 1e-4
         } 
     
 args['device'] = device
@@ -43,6 +45,7 @@ nb_hidden = args['nb_hidden']
 nb_outputs = args['nb_outputs']
 
 nb_steps = args['nb_steps']
+nb_epochs = args['nb_epochs']
 dt = args['timestep_size']
 
 tau_syn = args['tau_syn']
@@ -54,8 +57,11 @@ beta = np.exp(-dt/tau_mem)
 args['alpha'] = alpha
 args['beta'] = beta
 
+nb_trials = 1
+
 # 100 independent poisson trains
-input_trains = functions.poisson_trains(nb_inputs, 10*np.ones(100), args)
+spk_freq = 10
+input_trains = functions.poisson_trains(nb_inputs, spk_freq*np.ones(nb_inputs), args)
 
 # 5 equidistant spikes over 500 msec.
 target = torch.zeros((nb_steps), device=device, dtype=dtype)
@@ -69,22 +75,63 @@ target[500::int(nb_steps/5)] = 1
 
 w1, w2 = functions.new_initialize_weights_multilayer(nb_inputs, nb_hidden, nb_outputs, args)
 
-
 feedback_weights = functions.random_feedback(nb_hidden, nb_outputs, args).T # shape: (nb_outputs, nb_hidden)
-loss_rec = []
 
 gamma = float(np.exp(-dt/args['tau_rms']))
 
-learning_rates = np.array([5, 1, 10, 0.5, 0.1]) * 1e-3
+learning_rates = np.array([50, 5, 1, 10, 0.5, 0.1]) * 1e-3
 
 
 for r_0 in learning_rates:
   print("Learning rate =", r_0)
-  new_w1, new_w2, loss_rec = functions.train_multilayer_network(input_trains, w1, w2, feedback_weights, target, r_0, args)
   
-  plt.plot(loss_rec)
+  loss_rec = torch.empty((nb_trials, nb_epochs), device=device, dtype=dtype)
+  recordings_list = []
+
+  for i in range(nb_trials):
+
+    new_w1, new_w2, loss_rec[i], recordings = functions.train_multilayer_network(input_trains, w1, w2, feedback_weights, target, r_0, args)
+    recordings_list.append(recordings)  
+    plt.plot(loss_rec[i], alpha=0.5)
+
+  plt.plot(np.mean(loss_rec, axis=0), color='black', label='Avg. Loss')
   plt.title("Loss over epochs, learning rate = " + str(r_0))
-  plt.show()
+  plt.legend()
+  # plt.show()
+
+  data_folder = "data/" + \
+        str(datetime.datetime.today())[:13] + ' rate = ' + str(r_0) + '/'
+  location = os.path.abspath(data_folder)
+  location = os.path.join(os.getcwd(), location)
+  os.makedirs(location)
+
+  plt.savefig(location + "/loss over epochs" + "learning-rate = " + str(r_0) +
+              ", epsilon = " + str(args['epsilon']) + "spike freq = " + str(spk_freq) + ".jpg")
+
+  loss_file_name = location + "/loss_rec epsilon= " + \
+      str(args['epsilon']) + "learning_rate = " + \
+      str(r_0) + "spike freq = " + str(spk_freq)
+  loss_file = open(loss_file_name, 'wb')
+  pickle.dump(loss_rec, loss_file)
+  loss_file.close()
+
+  # Store args:
+  file_name = location + "/args epsilon = " + \
+      str(args['epsilon']) + " learning_rate = " + \
+      str(r_0) + " spike freq = " + str(spk_freq)
+  args_file = open(file_name, 'a')
+  args_file.write(str(args))
+  args_file.close()
+
+  recordings_filename = location + "/recordings epsilon= " + \
+        str(args['epsilon']) + "learning_rate = " + \
+        str(r_0) + "spike freq = " + str(spk_freq)
+
+  recordings_file = open(recordings_filename, 'wb')
+  pickle.dump(recordings_list, recordings_file)
+  recordings_file.close()
+
+
 
 """
 # Store the learned weights

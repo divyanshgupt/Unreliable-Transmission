@@ -25,6 +25,7 @@ def train_multilayer_network(input_trains, w1, w2, feedback_weights, target, r_0
     nb_steps = args['nb_steps']
     nb_epochs = args['nb_epochs']
     rho = args['rho'] # regularization strength
+    epsilon = args['epsilon']
 
     gamma = float(np.exp(-dt/args['tau_rms']))
 
@@ -32,6 +33,17 @@ def train_multilayer_network(input_trains, w1, w2, feedback_weights, target, r_0
 
     v_ij_1 = 1e-10*torch.ones((nb_inputs, nb_hidden), device=device, dtype=dtype)
     v_ij_2 = 1e-10*torch.ones((nb_hidden, nb_outputs), device=device, dtype=dtype)
+    v_ij_1_rec = torch.empty((nb_epochs, nb_inputs, nb_hidden), device=device, dtype=dtype)
+    v_ij_2_rec = torch.empty((nb_epochs, nb_hidden, nb_outputs), device=device, dtype=dtype)
+    g_ij2_1_rec = torch.empty((nb_epochs, nb_inputs, nb_hidden), device=device, dtype=dtype)
+    g_ij2_2_rec = torch.empty((nb_epochs, nb_hidden, nb_outputs), device=device, dtype=dtype)
+    learning_rate_1_rec = torch.empty((nb_epochs, nb_inputs, nb_hidden), device=device, dtype=dtype)
+    learning_rate_2_rec = torch.empty((nb_epochs, nb_hidden, nb_outputs), device=device, dtype=dtype)
+
+    weight_change_1_rec = torch.empty((nb_epochs, nb_inputs, nb_hidden), device=device, dtype=dtype)
+    weight_change_2_rec = torch.empty((nb_epochs, nb_hidden, nb_outputs), device=device, dtype=dtype)
+    weight_update_1_rec = torch.empty((nb_epochs, nb_inputs, nb_hidden), device=device, dtype=dtype)
+    weight_update_2_rec = torch.empty((nb_epochs, nb_hidden, nb_outputs), device=device, dtype=dtype)
 
     for i in tqdm(range(nb_epochs)):
         print("Epoch no:", i)
@@ -71,19 +83,36 @@ def train_multilayer_network(input_trains, w1, w2, feedback_weights, target, r_0
         v_ij_1, _ = torch.max(torch.stack([gamma*v_ij_1, g_ij_sq_1], dim=2), dim=2) # shape: (nb_inputs, nb_hidden)
         v_ij_2, _ = torch.max(torch.stack([gamma*v_ij_2, g_ij_sq_2], dim=2), dim=2) # shape: (nb_hidden, nb_outputs)
 
-        learning_rate_1 = r_0 / torch.sqrt(v_ij_1) # shape: (nb_inputs, nb_hidden)
-        learning_rate_2 = r_0 / torch.sqrt(v_ij_2) # shape: (nb_hidden, nb_outputs)
+        learning_rate_1 = r_0 / torch.sqrt(v_ij_1 + epsilon) # shape: (nb_inputs, nb_hidden)
+        learning_rate_2 = r_0 / torch.sqrt(v_ij_2 + epsilon) # shape: (nb_hidden, nb_outputs)
 
-        # Evaluate Weight Changes:
+        learning_rate_1_rec[i] = learning_rate_1
+        learning_rate_2_rec[i] = learning_rate_2
+        v_ij_1_rec[i] = v_ij_1
+        v_ij_2_rec[i] = v_ij_2
+        g_ij2_1_rec[i] = g_ij_sq_1
+        g_ij2_2_rec[i] = g_ij_sq_2
+
+
+        # Evaluate Weight change:
         w2_change = torch.sum(output_error.T * eligibility_2, dim=2) # sum along time dimension; final shape: (nb_hidden, nb_outputs)
         w1_change = torch.sum(feedback_error.T * eligibility_1, dim=2) # final shape: (nb_inputs, nb_hidden)
+
+        weight_change_1_rec[i] = w1_change
+        weight_change_2_rec[i] = w2_change
 
         regularization_1 = functions.heterosynaptic_regularization(spk_rec_1, args) # shape: (nb_hidden,)
         regularization_2 = functions.heterosynaptic_regularization(spk_rec_2, args) # shape: (nb_outputs,)
 
         # Update Weights:
-        w1 += (w1_change * learning_rate_1) - rho*(w1*regularization_1)
-        w2 += (w2_change * learning_rate_2) - rho*(w2*regularization_2)
+        weight_update_1 = (w1_change * learning_rate_1) - rho*(w1*regularization_1)
+        weight_update_2 = (w2_change * learning_rate_2) - rho*(w2*regularization_2)
+
+        w1 += weight_update_1
+        w2 += weight_update_2
+
+        weight_update_1_rec[i] = weight_update_1
+        weight_update_2_rec[i] = weight_update_2
 
         rate_med_1 = torch.median(learning_rate_1)
         rate_mean_1 = torch.mean(learning_rate_1)
@@ -95,5 +124,7 @@ def train_multilayer_network(input_trains, w1, w2, feedback_weights, target, r_0
         print("Learning rate 2: Median =", rate_med_2)
         print("Learning rate 2: Mean =", rate_mean_2)
 
+        recordings = (weight_change_1_rec, weight_change_2_rec, weight_update_1_rec, weight_update_2_rec, learning_rate_1_rec, learning_rate_2_rec, v_ij_1_rec, v_ij_2_rec, g_ij2_1_rec, g_ij2_2_rec)
 
-    return w1, w2, loss_rec
+
+    return w1, w2, loss_rec, recordings
