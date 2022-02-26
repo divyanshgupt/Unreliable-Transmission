@@ -34,7 +34,7 @@ def train_single_neuron(input_trains, target, weights, r_0, args):
     device = args['device']
     dtype = args['dtype']
     dt = args['timestep_size']
-
+    p = args['p']
 
     loss_rec = np.zeros(nb_epochs)
 
@@ -57,7 +57,13 @@ def train_single_neuron(input_trains, target, weights, r_0, args):
 
     for i in tqdm(range(nb_epochs)):
         print("\n Iteration no: ", i)
-        mem_rec, spk_rec[i], error_rec, eligibility_rec, pre_trace_rec = functions.run_single_neuron(input_trains, weights,
+
+        # Add probability mask
+        prob_array = p*torch.ones((nb_inputs, nb_steps), device=device, dtype=dtype)
+        mask = torch.bernoulli(prob_array)
+        masked_input_trains = mask * input_trains
+
+        mem_rec, spk_rec[i], error_rec, eligibility_rec, pre_trace_rec = functions.run_single_neuron(masked_input_trains, weights,
                                                                                         target, args)
         loss = functions.new_van_rossum_loss(spk_rec[i], target, args)
         loss_rec[i] = loss.to('cpu')

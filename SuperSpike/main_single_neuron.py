@@ -48,7 +48,8 @@ args = {'thres': -50,
         'device': device,  # for functions in different modules
         'dtype': dtype,
         'nb_epochs': 800,
-        'epsilon': 1e-4  # noise term for learning rate
+        'epsilon': 1e-4,  # noise term for learning rate
+        'p': 0.5
         }
 
 
