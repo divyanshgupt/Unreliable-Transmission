@@ -47,7 +47,7 @@ args = {'thres': -50,
         'nb_outputs': 1,
         'device': device,  # for functions in different modules
         'dtype': dtype,
-        'nb_epochs': 800,
+        'nb_epochs': 1000,
         'epsilon': 1e-4,  # noise term for learning rate
         'p': 0.5
         }
@@ -88,7 +88,8 @@ target[500:: nb_steps//5] = 1
 #learning_rates = np.array([10, 5, 1, 0.5, 0.1]) * 1e-3
 
 #learning_rates = np.array([5, 1, 10, 0.5 , 0.1]) * 1e-3
-learning_rates = np.array([30]) * 1e-3
+#learning_rates = np.array([30]) * 1e-3
+learning_rates = np.array([40, 60]) * 1e-3
 #learning_rates = learning_rates[::-1]
 
 for r_0 in learning_rates:
@@ -111,8 +112,8 @@ for r_0 in learning_rates:
     plt.plot(np.mean(loss_rec, axis=0), alpha=1,
              color='black', label="Avg. Loss")
     plt.legend()
-    plt.title("Loss, learning-rate = " + str(r_0) + ", epsilon = " +
-              str(args['epsilon']) + "spike freq = " + str(spk_freq))
+    plt.title("Loss, learning-rate = " + str(r_0) + ", p = " +
+              str(args['p']) + "spike freq = " + str(spk_freq))
     plt.xlabel("Epochs")
  #   plt.show()
 
@@ -123,7 +124,7 @@ for r_0 in learning_rates:
     os.makedirs(location)
 
     plt.savefig(location + "/loss over epochs" + "learning-rate = " + str(r_0) +
-                ", epsilon = " + str(args['epsilon']) + "spike freq = " + str(spk_freq) + ".jpg")
+                ", epsilon = " + str(args['epsilon']) + "spike freq = " + str(spk_freq) + ".png")
 
     loss_file_name = location + "/loss_rec epsilon= " + \
         str(args['epsilon']) + "learning_rate = " + \
