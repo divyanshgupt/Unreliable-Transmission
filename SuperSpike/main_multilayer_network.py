@@ -14,7 +14,7 @@ gpu = torch.device("cuda:0")
 
 device = cpu
 # Uncomment the line below to run on GPU
-device = gpu
+#device = gpu
 
 args = {'thres': -50,
         'u_rest': -60,
@@ -79,13 +79,14 @@ feedback_weights = functions.random_feedback(nb_hidden, nb_outputs, args).T # sh
 
 gamma = float(np.exp(-dt/args['tau_rms']))
 
-learning_rates = np.array([50, 5, 1, 10, 0.5, 0.1]) * 1e-3
-
+#learning_rates = np.array([50, 5, 1, 10, 0.5, 0.1]) * 1e-3
+learning_rates = np.array([50])*1e-3
 
 for r_0 in learning_rates:
   print("Learning rate =", r_0)
   
-  loss_rec = torch.empty((nb_trials, nb_epochs), device=device, dtype=dtype)
+#  loss_rec = torch.empty((nb_trials, nb_epochs), device=device, dtype=dtype)
+  loss_rec = np.empty((nb_trials, nb_epochs))
   recordings_list = []
 
   for i in range(nb_trials):
