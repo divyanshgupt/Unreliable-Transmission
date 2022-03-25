@@ -73,10 +73,12 @@ target[500::int(nb_steps/5)] = 1
 
 #w1, w2 = functions.initialize_weights_multilayer(nb_inputs, nb_hidden, nb_outputs, args, weight_scale)
 
-w1, w2 = functions.new_initialize_weights_multilayer(nb_inputs, nb_hidden, nb_outputs, args)
+w1, w2 = functions.new_initialize_weights_multilayer(nb_inputs, nb_hidden, nb_outputs, args) #shape: (nb_inputs, nb_hidden), (nb_hidden, nb_outputs)
 
-feedback_weights = functions.random_feedback(nb_hidden, nb_outputs, args).T # shape: (nb_outputs, nb_hidden)
+#feedback_weights = functions.random_feedback(nb_hidden, nb_outputs, args).T # shape: (nb_outputs, nb_hidden)
 
+# Symmetric Feedback
+feedback_weights = w2.T
 gamma = float(np.exp(-dt/args['tau_rms']))
 
 #learning_rates = np.array([50, 5, 1, 10, 0.5, 0.1]) * 1e-3
