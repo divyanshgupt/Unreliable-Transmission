@@ -102,7 +102,7 @@ for r_0 in learning_rates:
   plt.legend()
   # plt.show()
 
-  data_folder = "data/" + \
+  data_folder = "data/multilayer/" + \
         str(datetime.datetime.today())[:13] + ' rate = ' + str(r_0) + '/'
   location = os.path.abspath(data_folder)
   location = os.path.join(os.getcwd(), location)
