@@ -32,7 +32,7 @@ def train_multilayer_network(input_trains, w1, w2, feedback_weights, target, r_0
 
     loss_rec = np.zeros(nb_epochs)
 
-    v_ij_1 = 1e-10*torch.ones((nb_inputs, nb_hidden), device=device, dtype=dtype)   
+    v_ij_1 = 1e-10*torch.ones((nb_inputs, nb_hidden),    device=device, dtype=dtype)   
     v_ij_2 = 1e-10*torch.ones((nb_hidden, nb_outputs), device=device, dtype=dtype)
     v_ij_1_rec = torch.empty((nb_epochs, nb_inputs, nb_hidden), device=device, dtype=dtype)
     v_ij_2_rec = torch.empty((nb_epochs, nb_hidden, nb_outputs), device=device, dtype=dtype)
@@ -64,7 +64,7 @@ def train_multilayer_network(input_trains, w1, w2, feedback_weights, target, r_0
         print("Epoch no:", i)
         eligibility_1[i], eligibility_2[i], presynaptic_traces_1[i], presynaptic_traces_2[i], spk_rec_2[i], spk_rec_1[i], mem_rec_2[i], mem_rec_1[i] = functions.run_multilayer_network(input_trains, w1, w2, args)
         
-        output = torch.flatten(spk_rec_2)
+        output = torch.flatten(spk_rec_2[i])
 
         # Evaluate Loss & Store for Plotting:
         loss = functions.new_van_rossum_loss(target, output, args)
