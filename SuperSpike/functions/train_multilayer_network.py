@@ -2,7 +2,7 @@ import torch
 import numpy as np
 from matplotlib import pyplot as plt
 from tqdm import tqdm
-from SuperSpike.functions.error_signal import error_signal
+#from SuperSpike.functions.error_signal import error_signal
 import functions
 
 def train_multilayer_network(input_trains, w1, w2, feedback_weights, target, r_0, args):

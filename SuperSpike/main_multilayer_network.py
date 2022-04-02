@@ -109,7 +109,7 @@ for r_0 in learning_rates:
   os.makedirs(location)
 
   plt.savefig(location + "/loss over epochs" + "learning-rate = " + str(r_0) +
-              ", epsilon = " + str(args['epsilon']) + "spike freq = " + str(spk_freq) + ".jpg")
+              ", epsilon = " + str(args['epsilon']) + "spike freq = " + str(spk_freq) + ".png")
 
   loss_file_name = location + "/loss_rec epsilon= " + \
       str(args['epsilon']) + "learning_rate = " + \
