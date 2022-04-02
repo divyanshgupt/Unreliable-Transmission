@@ -2,6 +2,7 @@ import torch
 import numpy as np
 from matplotlib import pyplot as plt
 from tqdm import tqdm
+from SuperSpike.functions.error_signal import error_signal
 import functions
 
 def train_multilayer_network(input_trains, w1, w2, feedback_weights, target, r_0, args):
@@ -124,10 +125,10 @@ def train_multilayer_network(input_trains, w1, w2, feedback_weights, target, r_0
         print("Learning rate 2: Median =", rate_med_2)
         print("Learning rate 2: Mean =", rate_mean_2)
 
-        neural_dynamics = (spk_rec_1, spk_rec_2, mem_rec_1, mem_rec_2, presynaptic_traces_1, presynaptic_traces_2)
+        neural_dynamics = (spk_rec_1, spk_rec_2, mem_rec_1, mem_rec_2, presynaptic_traces_1, presynaptic_traces_2, eligibility_1, eligibility_2, output_error, feedback_error)  
         weight_dynamics = (weight_change_1_rec, weight_change_2_rec, weight_update_1_rec, weight_update_2_rec)
         learning_rate_dynamics = (learning_rate_1_rec, learning_rate_2_rec, v_ij_1_rec, v_ij_2_rec, g_ij2_1_rec, g_ij2_2_rec)
-        recordings = (neural_dynamics, weight_dynamics, learning_rate_dynamics)
+        recordings = (args, neural_dynamics, weight_dynamics, learning_rate_dynamics)
 
 
     return w1, w2, loss_rec, recordings
