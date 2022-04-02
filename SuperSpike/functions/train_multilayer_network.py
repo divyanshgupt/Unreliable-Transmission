@@ -116,8 +116,8 @@ def train_multilayer_network(input_trains, w1, w2, feedback_weights, target, r_0
         weight_change_1_rec[i] = w1_change
         weight_change_2_rec[i] = w2_change
 
-        regularization_1 = functions.heterosynaptic_regularization(spk_rec_1, args) # shape: (nb_hidden,)
-        regularization_2 = functions.heterosynaptic_regularization(spk_rec_2, args) # shape: (nb_outputs,)
+        regularization_1 = functions.heterosynaptic_regularization(spk_rec_1[i], args) # shape: (nb_hidden,)
+        regularization_2 = functions.heterosynaptic_regularization(spk_rec_2[i], args) # shape: (nb_outputs,)
 
         # Update Weights:
         weight_update_1 = (w1_change * learning_rate_1) - rho*(w1*regularization_1)
@@ -143,7 +143,7 @@ def train_multilayer_network(input_trains, w1, w2, feedback_weights, target, r_0
         neural_dynamics = (spk_rec_1, spk_rec_2, mem_rec_1, mem_rec_2, presynaptic_traces_1, presynaptic_traces_2, eligibility_1, eligibility_2, output_error, feedback_error)  
         weight_dynamics = (weight_change_1_rec, weight_change_2_rec, weight_update_1_rec, weight_update_2_rec)
         learning_rate_dynamics = (learning_rate_1_rec, learning_rate_2_rec, v_ij_1_rec, v_ij_2_rec, g_ij2_1_rec, g_ij2_2_rec)
-        recordings = (args, neural_dynamics, weight_dynamics, learning_rate_dynamics)
+        recordings = (args, input_trains, neural_dynamics, weight_dynamics, learning_rate_dynamics)
 
 
     return w1, w2, loss_rec, recordings
