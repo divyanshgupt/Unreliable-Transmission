@@ -32,7 +32,7 @@ def train_multilayer_network(input_trains, w1, w2, feedback_weights, target, r_0
 
     loss_rec = np.zeros(nb_epochs)
 
-    v_ij_1 = 1e-10*torch.ones((nb_inputs, nb_hidden), device=device, dtype=dtype)
+    v_ij_1 = 1e-10*torch.ones((nb_inputs, nb_hidden), device=device, dtype=dtype)   
     v_ij_2 = 1e-10*torch.ones((nb_hidden, nb_outputs), device=device, dtype=dtype)
     v_ij_1_rec = torch.empty((nb_epochs, nb_inputs, nb_hidden), device=device, dtype=dtype)
     v_ij_2_rec = torch.empty((nb_epochs, nb_hidden, nb_outputs), device=device, dtype=dtype)
@@ -46,9 +46,23 @@ def train_multilayer_network(input_trains, w1, w2, feedback_weights, target, r_0
     weight_update_1_rec = torch.empty((nb_epochs, nb_inputs, nb_hidden), device=device, dtype=dtype)
     weight_update_2_rec = torch.empty((nb_epochs, nb_hidden, nb_outputs), device=device, dtype=dtype)
 
+    spk_rec_1 = torch.empty((nb_epochs, nb_hidden, nb_steps), device=device, dtype=dtype)
+    spk_rec_2 = torch.empty((nb_epochs, nb_outputs, nb_steps), device=device, dtype=dtype)
+    mem_rec_1 = torch.empty((nb_epochs, nb_hidden, nb_steps), device=device, dtype=dtype)
+    mem_rec_2 = torch.empty((nb_epochs, nb_outputs, nb_steps), device=device, dtype=dtype)
+    eligibility_1 = torch.empty((nb_epochs, nb_inputs, nb_hidden, nb_steps), device=device, dtype=dtype)
+    eligibility_2 = torch.empty((nb_epochs, nb_hidden, nb_outputs, nb_steps), device=device, dtype=dtype)
+
+    presynaptic_traces_1 = torch.empty((nb_epochs, nb_inputs, nb_steps), device=device, dtype=dtype)
+    presynaptic_traces_2 = torch.empty((nb_epochs, nb_hidden, nb_steps), device=device, dtype=dtype)
+
+    output_error = torch.empty((nb_epochs, nb_steps, nb_outputs), device=device, dtype=dtype)
+    feedback_error = torch.empty((nb_epochs, nb_steps, nb_hidden), device=device, dtype=dtype)
+
     for i in tqdm(range(nb_epochs)):
+    
         print("Epoch no:", i)
-        eligibility_1, eligibility_2, presynaptic_traces_1, presynaptic_traces_2, spk_rec_2, spk_rec_1, mem_rec_2, mem_rec_1 = functions.run_multilayer_network(input_trains, w1, w2, args)
+        eligibility_1[i], eligibility_2[i], presynaptic_traces_1[i], presynaptic_traces_2[i], spk_rec_2[i], spk_rec_1[i], mem_rec_2[i], mem_rec_1[i] = functions.run_multilayer_network(input_trains, w1, w2, args)
         
         output = torch.flatten(spk_rec_2)
 
@@ -59,10 +73,10 @@ def train_multilayer_network(input_trains, w1, w2, feedback_weights, target, r_0
         print("Loss =", loss)
 
         # Evaluate Error Signal for both layers:
-        output_error = torch.unsqueeze(functions.new_error_signal(output, target, args), 1) # shape: (nb_steps, nb_outputs)
+        output_error[i] = torch.unsqueeze(functions.new_error_signal(output, target, args), 1) # shape: (nb_steps, nb_outputs)
     #    norm_factor, _ = torch.max(output_error, dim=0)
     #    output_error /= norm_factor
-        feedback_error = output_error @ feedback_weights # shape: (nb_steps, nb_hidden)
+        feedback_error[i] = output_error[i] @ feedback_weights # shape: (nb_steps, nb_hidden)
 
         # Normalize traces:
     #    norm_factor_e_1, _ = torch.max(eligibility_1, dim=2) # take max along time dimension
@@ -78,8 +92,8 @@ def train_multilayer_network(input_trains, w1, w2, feedback_weights, target, r_0
     #    eligibility_2[eligibility_2 != eligibility_2] = 0
         
         # Per-parameter learning rate:
-        g_ij_sq_1 = torch.sum((feedback_error.T * eligibility_1)**2, dim=2) # shape: (nb_inputs, nb_hidden)
-        g_ij_sq_2 = torch.sum((output_error.T * eligibility_2)**2, dim=2) # shape: (nb_hidden, nb_outputs)
+        g_ij_sq_1 = torch.sum((feedback_error[i].T * eligibility_1[i])**2, dim=2) # shape: (nb_inputs, nb_hidden)
+        g_ij_sq_2 = torch.sum((output_error[i].T * eligibility_2[i])**2, dim=2) # shape: (nb_hidden, nb_outputs)
 
         v_ij_1, _ = torch.max(torch.stack([gamma*v_ij_1, g_ij_sq_1], dim=2), dim=2) # shape: (nb_inputs, nb_hidden)
         v_ij_2, _ = torch.max(torch.stack([gamma*v_ij_2, g_ij_sq_2], dim=2), dim=2) # shape: (nb_hidden, nb_outputs)
@@ -96,8 +110,8 @@ def train_multilayer_network(input_trains, w1, w2, feedback_weights, target, r_0
 
 
         # Evaluate Weight change:
-        w2_change = torch.sum(output_error.T * eligibility_2, dim=2) # sum along time dimension; final shape: (nb_hidden, nb_outputs)
-        w1_change = torch.sum(feedback_error.T * eligibility_1, dim=2) # final shape: (nb_inputs, nb_hidden)
+        w2_change = torch.sum(output_error[i].T * eligibility_2[i], dim=2) # sum along time dimension; final shape: (nb_hidden, nb_outputs)
+        w1_change = torch.sum(feedback_error[i].T * eligibility_1[i], dim=2) # final shape: (nb_inputs, nb_hidden)
 
         weight_change_1_rec[i] = w1_change
         weight_change_2_rec[i] = w2_change
@@ -124,6 +138,7 @@ def train_multilayer_network(input_trains, w1, w2, feedback_weights, target, r_0
         rate_mean_2 = torch.mean(learning_rate_2)
         print("Learning rate 2: Median =", rate_med_2)
         print("Learning rate 2: Mean =", rate_mean_2)
+
 
         neural_dynamics = (spk_rec_1, spk_rec_2, mem_rec_1, mem_rec_2, presynaptic_traces_1, presynaptic_traces_2, eligibility_1, eligibility_2, output_error, feedback_error)  
         weight_dynamics = (weight_change_1_rec, weight_change_2_rec, weight_update_1_rec, weight_update_2_rec)
