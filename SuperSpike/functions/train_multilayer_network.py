@@ -59,8 +59,13 @@ def train_multilayer_network(input_trains, w1, w2, feedback_weights, target, r_0
     output_error = torch.empty((nb_epochs, nb_steps, nb_outputs), device=device, dtype=dtype)
     feedback_error = torch.empty((nb_epochs, nb_steps, nb_hidden), device=device, dtype=dtype)
 
+    w1_rec = torch.empty((nb_epochs + 1, nb_inputs, nb_hidden), device=device, dtype=dtype)
+    w2_rec = torch.empty((nb_epochs + 1, nb_hidden, nb_outputs), device=device, dtype=dtype)
+
+    w1_rec[0] = w1
+    w2_rec[0] = w2
     for i in tqdm(range(nb_epochs)):
-    
+        
         print("Epoch no:", i)
         eligibility_1[i], eligibility_2[i], presynaptic_traces_1[i], presynaptic_traces_2[i], spk_rec_2[i], spk_rec_1[i], mem_rec_2[i], mem_rec_1[i] = functions.run_multilayer_network(input_trains, w1, w2, args)
         
@@ -139,11 +144,13 @@ def train_multilayer_network(input_trains, w1, w2, feedback_weights, target, r_0
         print("Learning rate 2: Median =", rate_med_2)
         print("Learning rate 2: Mean =", rate_mean_2)
 
+        w1_rec[i + 1] = w1
+        w2_rec[i + 1] = w2 
 
-        neural_dynamics = (spk_rec_1, spk_rec_2, mem_rec_1, mem_rec_2, presynaptic_traces_1, presynaptic_traces_2, eligibility_1, eligibility_2, output_error, feedback_error)  
-        weight_dynamics = (weight_change_1_rec, weight_change_2_rec, weight_update_1_rec, weight_update_2_rec)
-        learning_rate_dynamics = (learning_rate_1_rec, learning_rate_2_rec, v_ij_1_rec, v_ij_2_rec, g_ij2_1_rec, g_ij2_2_rec)
-        recordings = (args, input_trains, neural_dynamics, weight_dynamics, learning_rate_dynamics)
+    neural_dynamics = (spk_rec_1, spk_rec_2, mem_rec_1, mem_rec_2, presynaptic_traces_1, presynaptic_traces_2, eligibility_1, eligibility_2, output_error, feedback_error)  
+    weight_dynamics = (w1_rec, w2_rec, weight_change_1_rec, weight_change_2_rec, weight_update_1_rec, weight_update_2_rec)
+    learning_rate_dynamics = (learning_rate_1_rec, learning_rate_2_rec, v_ij_1_rec, v_ij_2_rec, g_ij2_1_rec, g_ij2_2_rec)
+    recordings = (args, input_trains, neural_dynamics, weight_dynamics, learning_rate_dynamics)
 
 
     return w1, w2, loss_rec, recordings
