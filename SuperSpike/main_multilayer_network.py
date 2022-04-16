@@ -16,6 +16,8 @@ device = cpu
 # Uncomment the line below to run on GPU
 #device = gpu
 
+note = ""
+
 args = {'thres': -50,
         'u_rest': -60,
         'tau_mem': 1e-2,
@@ -108,8 +110,11 @@ for r_0 in learning_rates:
   location = os.path.join(os.getcwd(), location)
   os.makedirs(location)
 
+
+
   plt.savefig(location + "/loss over epochs" + "learning-rate = " + str(r_0) +
               ", epsilon = " + str(args['epsilon']) + "spike freq = " + str(spk_freq) + ".png")
+
 
   loss_file_name = location + "/loss_rec epsilon= " + \
       str(args['epsilon']) + "learning_rate = " + \
@@ -123,7 +128,8 @@ for r_0 in learning_rates:
       str(args['epsilon']) + " learning_rate = " + \
       str(r_0) + " spike freq = " + str(spk_freq)
   args_file = open(file_name, 'a')
-  args_file.write(str(args))
+  args_file.write(str(args) + '\n \n')
+  args_file.write(note)
   args_file.close()
 
   recordings_filename = location + "/recordings epsilon= " + \
