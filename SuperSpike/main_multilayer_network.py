@@ -77,10 +77,16 @@ target[500::int(nb_steps/5)] = 1
 
 w1, w2 = functions.new_initialize_weights_multilayer(nb_inputs, nb_hidden, nb_outputs, args) #shape: (nb_inputs, nb_hidden), (nb_hidden, nb_outputs)
 
+# Random feedback
 #feedback_weights = functions.random_feedback(nb_hidden, nb_outputs, args).T # shape: (nb_outputs, nb_hidden)
+
+# Uniform Feedback
+#feedback_weights = torch.ones((nb_outputs, nb_hidden), device=device, dtype=dtype)
 
 # Symmetric Feedback
 feedback_weights = w2.T
+
+
 gamma = float(np.exp(-dt/args['tau_rms']))
 
 #learning_rates = np.array([50, 5, 1, 10, 0.5, 0.1]) * 1e-3
