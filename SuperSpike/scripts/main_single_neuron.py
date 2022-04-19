@@ -3,8 +3,8 @@ from matplotlib import pyplot as plt
 import torch
 from tqdm import tqdm
 import os  # To create a folder for each run
-import functions
-#import functions.plot
+import src
+#import src.plot
 import datetime
 import json  # To save simulation parameters in a text file
 #import pdb
@@ -45,7 +45,7 @@ args = {'thres': -50,
         'tau_rms': 5e-4,  # this is a guess and might need changing
         'nb_inputs': 100,
         'nb_outputs': 1,
-        'device': device,  # for functions in different modules
+        'device': device,  # for src in different modules
         'dtype': dtype,
         'nb_epochs': 1000,
         'epsilon': 1e-4,  # noise term for learning rate
@@ -75,13 +75,13 @@ args['beta'] = beta
 # input trains
 # not sure about this, but assuming it since the paper uses 10 Hz frequency as the target output frequency (actually, 5 equidistant spikes over 500 ms)
 spk_freq = 10
-input_trains = functions.poisson_trains(100, spk_freq*np.ones(100), args)
+input_trains = src.poisson_trains(100, spk_freq*np.ones(100), args)
 
 # Create Target Train
 target = torch.zeros(nb_steps, device=device, dtype=dtype)
 target[500:: nb_steps//5] = 1
 
-# weights = functions.initialize_weights(nb_inputs, nb_outputs, args, scale=80) # initialize weights
+# weights = src.initialize_weights(nb_inputs, nb_outputs, args, scale=80) # initialize weights
 
 
 # v_ij = 1e-2*torch.zeros((nb_inputs, nb_outputs), device=device, dtype=dtype)
@@ -102,8 +102,8 @@ for r_0 in learning_rates:
     recordings_list = []
 
     for i in range(nb_trials):
-        weights = functions.new_initialize_weights(nb_inputs, nb_outputs, args)
-        new_weights, loss_rec[i], recordings = functions.train_single_neuron(
+        weights = src.new_initialize_weights(nb_inputs, nb_outputs, args)
+        new_weights, loss_rec[i], recordings = src.train_single_neuron(
             input_trains, target, weights, r_0, args)
         recordings_list.append(recordings)
         #r_ij, v_ij, g_ij2 = learning_rate_params
@@ -168,8 +168,8 @@ sys.stdout = orig_stdout
     #location = os.path.cudir()
     # Store parameters (in dict args) in the given location
     
-    functions.plot.plot_loss(loss_rec, location, args) # Saves the loss-over-epochs plot in the given location
-    functions.plot.plot_learning_rate_params(learning_rate_params, location, args)
+    src.plot.plot_loss(loss_rec, location, args) # Saves the loss-over-epochs plot in the given location
+    src.plot.plot_learning_rate_params(learning_rate_params, location, args)
 
     # Store weights
     file_name = location + "/weights" #+ str(datetime.datetime.now())[:10]
@@ -202,11 +202,11 @@ plt.show()
 """ for i in range(nb_epochs):
 
     print("\n Iteration:", i+1)
-    mem_rec, spk_rec, error_rec, eligibility_rec, pre_trace_rec = functions.run_single_neuron(input_trains, weights,
+    mem_rec, spk_rec, error_rec, eligibility_rec, pre_trace_rec = src.run_single_neuron(input_trains, weights,
                                                                                     target, args)
     # loss = van_rossum_loss(spk_rec, target, args)
     # print("Loss = ", loss)
-    norm_loss = functions.van_rossum_loss(spk_rec, target, args)
+    norm_loss = src.van_rossum_loss(spk_rec, target, args)
     print("Normalized Loss =", norm_loss)
     loss_rec.append(norm_loss)
 
