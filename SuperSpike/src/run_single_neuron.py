@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 import torch
 from tqdm import tqdm
 
-import functions
+import src
 
 def run_single_neuron(input_trains, weights, target, args):
   """
@@ -43,7 +43,7 @@ def run_single_neuron(input_trains, weights, target, args):
 
   for t in range(nb_steps):
 
-    out = functions.spike_fn(mem, thres, args)
+    out = src.spike_fn(mem, thres, args)
 
     spk_rec.append(out)
     mem_rec.append(mem)
@@ -71,7 +71,7 @@ def run_single_neuron(input_trains, weights, target, args):
   spk_rec = torch.stack(spk_rec, dim=0)
   spk_rec = torch.flatten(spk_rec) # stack as a 1-D array for easy difference with target train for error signal evaluation
   # compute presynaptic traces of shape: (nb_inputs, timesteps) 
-  presynaptic_traces = functions.new_presynaptic_trace(input_trains, args) 
+  presynaptic_traces = src.new_presynaptic_trace(input_trains, args) 
 
   # evaluate hebbian coincidence
   h = mem_rec.T - thres  # shape: (nb_outputs, timesteps)
@@ -81,9 +81,9 @@ def run_single_neuron(input_trains, weights, target, args):
   hebbian = A * B # AB.T shape: (nb_inputs, nb_outputs, nb_timesteps)
 
   # eligibility trace
-  eligibility = functions.new_eligibility_trace(hebbian, args)
+  eligibility = src.new_eligibility_trace(hebbian, args)
   
   # error signal
-  error = functions.new_error_signal(spk_rec, target, args)
+  error = src.new_error_signal(spk_rec, target, args)
 
   return mem_rec, spk_rec, error, eligibility, presynaptic_traces

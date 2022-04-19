@@ -4,7 +4,7 @@ from tqdm import tqdm
 import torch
 import datetime
 import pickle
-import functions
+import src
 import os
 
 # set device
@@ -63,7 +63,7 @@ nb_trials = 1
 
 # 100 independent poisson trains
 spk_freq = 10
-input_trains = functions.poisson_trains(nb_inputs, spk_freq*np.ones(nb_inputs), args)
+input_trains = src.poisson_trains(nb_inputs, spk_freq*np.ones(nb_inputs), args)
 
 # 5 equidistant spikes over 500 msec.
 target = torch.zeros((nb_steps), device=device, dtype=dtype)
@@ -73,12 +73,12 @@ target[500::int(nb_steps/5)] = 1
 
 #weight_scale = 100
 
-#w1, w2 = functions.initialize_weights_multilayer(nb_inputs, nb_hidden, nb_outputs, args, weight_scale)
+#w1, w2 = src.initialize_weights_multilayer(nb_inputs, nb_hidden, nb_outputs, args, weight_scale)
 
-w1, w2 = functions.new_initialize_weights_multilayer(nb_inputs, nb_hidden, nb_outputs, args) #shape: (nb_inputs, nb_hidden), (nb_hidden, nb_outputs)
+w1, w2 = src.new_initialize_weights_multilayer(nb_inputs, nb_hidden, nb_outputs, args) #shape: (nb_inputs, nb_hidden), (nb_hidden, nb_outputs)
 
 # Random feedback
-#feedback_weights = functions.random_feedback(nb_hidden, nb_outputs, args).T # shape: (nb_outputs, nb_hidden)
+#feedback_weights = src.random_feedback(nb_hidden, nb_outputs, args).T # shape: (nb_outputs, nb_hidden)
 
 # Uniform Feedback
 #feedback_weights = torch.ones((nb_outputs, nb_hidden), device=device, dtype=dtype)
@@ -101,7 +101,7 @@ for r_0 in learning_rates:
 
   for i in range(nb_trials):
 
-    new_w1, new_w2, loss_rec[i], recordings = functions.train_multilayer_network(input_trains, w1, w2, feedback_weights, target, r_0, args)
+    new_w1, new_w2, loss_rec[i], recordings = src.train_multilayer_network(input_trains, w1, w2, feedback_weights, target, r_0, args)
     recordings_list.append(recordings)  
     plt.plot(loss_rec[i], alpha=0.5)
 

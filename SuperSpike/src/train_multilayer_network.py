@@ -3,7 +3,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from tqdm import tqdm
 #from SuperSpike.functions.error_signal import error_signal
-import functions
+import src
 
 def train_multilayer_network(input_trains, w1, w2, feedback_weights, target, r_0, args):
     """
@@ -67,18 +67,18 @@ def train_multilayer_network(input_trains, w1, w2, feedback_weights, target, r_0
     for i in tqdm(range(nb_epochs)):
         
         print("Epoch no:", i)
-        eligibility_1[i], eligibility_2[i], presynaptic_traces_1[i], presynaptic_traces_2[i], spk_rec_2[i], spk_rec_1[i], mem_rec_2[i], mem_rec_1[i] = functions.run_multilayer_network(input_trains, w1, w2, args)
+        eligibility_1[i], eligibility_2[i], presynaptic_traces_1[i], presynaptic_traces_2[i], spk_rec_2[i], spk_rec_1[i], mem_rec_2[i], mem_rec_1[i] = src.run_multilayer_network(input_trains, w1, w2, args)
         
         output = torch.flatten(spk_rec_2[i])
 
         # Evaluate Loss & Store for Plotting:
-        loss = functions.new_van_rossum_loss(target, output, args)
+        loss = src.new_van_rossum_loss(target, output, args)
 
         loss_rec[i] = loss
         print("Loss =", loss)
 
         # Evaluate Error Signal for both layers:
-        output_error[i] = torch.unsqueeze(functions.new_error_signal(output, target, args), 1) # shape: (nb_steps, nb_outputs)
+        output_error[i] = torch.unsqueeze(src.new_error_signal(output, target, args), 1) # shape: (nb_steps, nb_outputs)
     #    norm_factor, _ = torch.max(output_error, dim=0)
     #    output_error /= norm_factor
         feedback_error[i] = output_error[i] @ feedback_weights # shape: (nb_steps, nb_hidden)
@@ -121,8 +121,8 @@ def train_multilayer_network(input_trains, w1, w2, feedback_weights, target, r_0
         weight_change_1_rec[i] = w1_change
         weight_change_2_rec[i] = w2_change
 
-        regularization_1 = functions.heterosynaptic_regularization(spk_rec_1[i], args) # shape: (nb_hidden,)
-        regularization_2 = functions.heterosynaptic_regularization(spk_rec_2[i], args) # shape: (nb_outputs,)
+        regularization_1 = src.heterosynaptic_regularization(spk_rec_1[i], args) # shape: (nb_hidden,)
+        regularization_2 = src.heterosynaptic_regularization(spk_rec_2[i], args) # shape: (nb_outputs,)
 
         # Update Weights:
         weight_update_1 = (w1_change * learning_rate_1) - rho*(w1*regularization_1)

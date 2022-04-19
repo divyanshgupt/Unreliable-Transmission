@@ -2,7 +2,7 @@ import torch
 import numpy as np
 from matplotlib import pyplot as plt
 from tqdm import tqdm
-import functions
+import src
 
 def heterosynaptic_regularization(activity, args):
     """

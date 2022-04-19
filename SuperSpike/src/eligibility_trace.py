@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 import torch
 from tqdm import tqdm
 
-import functions
+import src
 
 def eligibility_trace(hebbian, args):
   """

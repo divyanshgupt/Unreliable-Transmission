@@ -64,7 +64,7 @@ def new_error_signal(output, target, args):
 
   time_array = torch.arange(0, nb_timesteps*dt, dt, dtype=dtype, device=device)
 
-  # create a model trace for a single spike at t=0, shape:(nb_timesteps)
+  # create a model trace for a single spike at t=s0, shape:(nb_timesteps)
   model_trace = (1/(t_rise-t_decay))*(torch.exp(-time_array/t_rise) - torch.exp(-time_array/t_decay))
 
   final_trace = torch.zeros(nb_timesteps, device=device, dtype=dtype)

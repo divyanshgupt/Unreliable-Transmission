@@ -3,7 +3,7 @@ import numpy as np
 import torch
 from matplotlib import pyplot as plt
 from tqdm import tqdm
-import functions
+import src
 import pickle
 import datetime
 from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -63,9 +63,9 @@ def train_single_neuron(input_trains, target, weights, r_0, args):
         mask = torch.bernoulli(prob_array)
         masked_input_trains = mask * input_trains
 
-        mem_rec, spk_rec[i], error_rec, eligibility_rec, pre_trace_rec = functions.run_single_neuron(masked_input_trains, weights,
+        mem_rec, spk_rec[i], error_rec, eligibility_rec, pre_trace_rec = src.run_single_neuron(masked_input_trains, weights,
                                                                                         target, args)
-        loss = functions.new_van_rossum_loss(spk_rec[i], target, args)
+        loss = src.new_van_rossum_loss(spk_rec[i], target, args)
         loss_rec[i] = loss.to('cpu')
         print("Loss =", loss)
 
@@ -198,12 +198,12 @@ def train_single_neuron(input_trains, target, weights, r_0, args):
     for i in tqdm(range(nb_epochs)):
 
         #print("\n Iteration:", i+1)
-        mem_rec, spk_rec, error_rec, eligibility_rec, pre_trace_rec = functions.run_single_neuron(input_trains, weights,
+        mem_rec, spk_rec, error_rec, eligibility_rec, pre_trace_rec = src.run_single_neuron(input_trains, weights,
                                                                                         target, args)
         # loss = van_rossum_loss(spk_rec, target, args)
         # print("Loss = ", loss)
 
-        norm_loss = functions.van_rossum_loss(spk_rec, target, args)
+        norm_loss = src.van_rossum_loss(spk_rec, target, args)
         #print("Normalized Loss =", norm_loss)
         loss_rec[i] = norm_loss
 
