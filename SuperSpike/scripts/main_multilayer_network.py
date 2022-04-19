@@ -49,8 +49,6 @@ feedback_type = 'random'
 feedback_weights = w2.T
 
 
-gamma = float(np.exp(-dt/args['tau_rms']))
-
 #learning_rates = np.array([50, 5, 1, 10, 0.5, 0.1]) * 1e-3
 learning_rates = np.array([50])*1e-3
 
@@ -72,45 +70,46 @@ for r_0 in learning_rates:
   plt.legend()
   # plt.show()
 
-  data_folder = "data/multilayer/" + \
-        str(datetime.today())[:13] + ' rate = ' + str(r_0) + '/'
-  location = os.path.abspath(data_folder)
-  location = os.path.join(os.getcwd(), location)
-  os.makedirs(location)
+  # data_folder = "data/multilayer/" + \
+  #       str(datetime.today())[:13] + ' rate = ' + str(r_0) + '/'
+  # location = os.path.abspath(data_folder)
+  # location = os.path.join(os.getcwd(), location)
+  # os.makedirs(location)
 
+  date_stamp = str(datetime.today())[:13]
+  location = src.set_location(f'data/multilayer/{feedback_type}/{date_stamp} r_0={r_0}')
 
 
   plt.savefig(location + "/loss over epochs" + "learning-rate = " + str(r_0) +
               ", epsilon = " + str(args['epsilon']) + "spike freq = " + str(spk_freq) + ".png")
 
 
-  loss_file_name = location + "/loss_rec epsilon= " + \
-      str(args['epsilon']) + "learning_rate = " + \
-      str(r_0) + "spike freq = " + str(spk_freq)
-  loss_file = open(loss_file_name, 'wb')
-  pickle.dump(loss_rec, loss_file)
-  loss_file.close()
+  # loss_file_name = location + "/loss_rec epsilon= " + \
+  #     str(args['epsilon']) + "learning_rate = " + \
+  #     str(r_0) + "spike freq = " + str(spk_freq)
+  # loss_file = open(loss_file_name, 'wb')
+  # pickle.dump(loss_rec, loss_file)
+  # loss_file.close()
 
   # Store args:
-  file_name = location + "/args epsilon = " + \
-      str(args['epsilon']) + " learning_rate = " + \
-      str(r_0) + " spike freq = " + str(spk_freq)
-  args_file = open(file_name, 'a')
-  args_file.write(str(args) + '\n \n')
-  args_file.write(note)
-  args_file.close()
+  # file_name = location + "/args epsilon = " + \
+  #     str(args['epsilon']) + " learning_rate = " + \
+  #     str(r_0) + " spike freq = " + str(spk_freq)
+  # args_file = open(file_name, 'a')
+  # args_file.write(str(args) + '\n \n')
+  # args_file.write(note)
+  # args_file.close()
 
-  date_stamp = str(datetime.today())
-  location = src.set_location(f'data/multilayer/{feedback_type}/')
+
   src.save_data(f'{args} \n \n {note}', location, f'args', method='text')
   src.save_data(recordings, location, 'recordings', method='pickle')
   src.save_data(loss_rec, location, 'loss_rec', method='pickle')
 
-  recordings_filename = location + "/recordings epsilon= " + \
-        str(args['epsilon']) + "learning_rate = " + \
-        str(r_0) + "spike freq = " + str(spk_freq)
+  # recordings_filename = location + "/recordings epsilon= " + \
+  #       str(args['epsilon']) + "learning_rate = " + \
+  #       str(r_0) + "spike freq = " + str(spk_freq)
 
-  recordings_file = open(recordings_filename, 'wb')
-  pickle.dump(recordings_list, recordings_file)
-  recordings_file.close()
+  # recordings_file = open(recordings_filename, 'wb')
+  # pickle.dump(recordings_list, recordings_file)
+  # recordings_file.close()
 
