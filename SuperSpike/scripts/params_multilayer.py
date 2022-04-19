@@ -1,9 +1,10 @@
 import numpy as np
 import torch
 
-device = torch.device('cpu')
-# device = torch.device('gpu')
+cpu = torch.device('cpu')
+# gpu = torch.device('cuda:0')
 dtype = torch.float
+device = cpu
 
 args = {'thres': -50,
         'u_rest': -60,
