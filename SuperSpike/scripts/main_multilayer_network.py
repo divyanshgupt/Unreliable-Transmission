@@ -2,9 +2,9 @@ import numpy as np
 from matplotlib import pyplot as plt
 from tqdm import tqdm
 import torch
-import datetime
+from datetime import datetime
 import pickle
-import ..src
+import src
 import os
 from src.params_multilayer import *
 
@@ -36,6 +36,8 @@ target[500::int(nb_steps/5)] = 1
 #w1, w2 = src.initialize_weights_multilayer(nb_inputs, nb_hidden, nb_outputs, args, weight_scale)
 
 w1, w2 = src.new_initialize_weights_multilayer(nb_inputs, nb_hidden, nb_outputs, args) #shape: (nb_inputs, nb_hidden), (nb_hidden, nb_outputs)
+
+feedback_type = 'random'
 
 # Random feedback
 #feedback_weights = src.random_feedback(nb_hidden, nb_outputs, args).T # shape: (nb_outputs, nb_hidden)
@@ -71,7 +73,7 @@ for r_0 in learning_rates:
   # plt.show()
 
   data_folder = "data/multilayer/" + \
-        str(datetime.datetime.today())[:13] + ' rate = ' + str(r_0) + '/'
+        str(datetime.today())[:13] + ' rate = ' + str(r_0) + '/'
   location = os.path.abspath(data_folder)
   location = os.path.join(os.getcwd(), location)
   os.makedirs(location)
@@ -98,7 +100,8 @@ for r_0 in learning_rates:
   args_file.write(note)
   args_file.close()
 
-  
+  date_stamp = str(datetime.today())
+  location = src.set_location(f'data/multilayer/{feedback_type}/')
   src.save_data(f'{args} \n \n {note}', location, f'args', method='text')
   src.save_data(recordings, location, 'recordings', method='pickle')
   src.save_data(loss_rec, location, 'loss_rec', method='pickle')

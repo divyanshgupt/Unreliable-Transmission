@@ -1,4 +1,9 @@
 import numpy as np
+import torch
+
+device = torch.device('cpu')
+# device = torch.device('gpu')
+dtype = torch.float
 
 args = {'thres': -50,
         'u_rest': -60,
@@ -40,3 +45,5 @@ beta = np.exp(-dt/tau_mem)
 
 args['alpha'] = alpha
 args['beta'] = beta
+
+gamma = float(np.exp(-dt/args['tau_rms']))
